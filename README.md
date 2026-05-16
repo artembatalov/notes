@@ -6,6 +6,7 @@
 
 [![PDF Cheatsheet](https://img.shields.io/badge/PDF-Cheatsheet-2563eb?style=for-the-badge&logo=adobeacrobatreader&logoColor=white)](./pdf/cheatsheet.pdf)
 [![Visualizations](https://img.shields.io/badge/31-интерактивных%20визуализаций-6366f1?style=for-the-badge&logo=d3dotjs&logoColor=white)](./viz/)
+[![Literature](https://img.shields.io/badge/📚-Литература%20(Google%20Drive)-34a853?style=for-the-badge&logo=googledrive&logoColor=white)](https://drive.google.com/drive/folders/1OYwpe7jFld04T2bKJxTDQFW1taN8GMwN?usp=share_link)
 
 *Шпаргалка с псевдокодом + пошаговые анимации алгоритмов*
 
@@ -17,6 +18,7 @@
 
 - [Визуализации](#-визуализации)
 - [Шпаргалка PDF](#-шпаргалка-pdf)
+- [Литература](#-литература)
 - [Запуск локально](#-запуск-локально)
 - [Темы](#-темы)
 
@@ -53,6 +55,14 @@ viz/
 
 Компактная шпаргалка на все 31 тему с псевдокодом и асимптотиками.
 Исходник: [`typ/cheatsheet.typ`](./typ/cheatsheet.typ) (Typst).
+
+---
+
+## 📚 Литература
+
+Учебные материалы по курсу — книги, конспекты, задачи:
+
+**[→ Google Drive: Литература по алгоритмам](https://drive.google.com/drive/folders/1OYwpe7jFld04T2bKJxTDQFW1taN8GMwN?usp=share_link)**
 
 ---
 
