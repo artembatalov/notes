@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>20 — Динамическое программирование</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../shared/base.css">
+</head>
+<body>
+<header>
+  <a href="../index.html" class="back-link">← Все алгоритмы</a>
+  <h1>20 — <span>Динамическое программирование</span></h1>
+  <div class="complexity">
+    <span class="badge">Задачи: <b>O(n)–O(n·W)</b></span>
+    <span class="badge">Память: <b>O(n)–O(n·W)</b></span>
+  </div>
+</header>
+<main>
+  <div id="left-panel">
+    <div id="controls"></div>
+    <div class="tab-bar" id="mode-tabs" style="display:flex;gap:6px;padding:8px 12px;border-bottom:1px solid #242424;flex-shrink:0">
+      <button class="btn active" id="tab-jump" onclick="setMode('jump')">Кузнечик</button>
+      <button class="btn" id="tab-knap" onclick="setMode('knap')">Рюкзак</button>
+      <button class="btn" id="tab-lis" onclick="setMode('lis')">НВП</button>
+    </div>
+    <div id="canvas-wrap">
+      <svg id="viz-svg"></svg>
+      <div class="canvas-hint">Три задачи: кузнечик, рюкзак, НВП</div>
+    </div>
+  </div>
+  <div id="right-panel">
+    <div id="pseudo"><h3>Псевдокод</h3></div>
+    <div id="state-panel">
+      <h3>Состояние</h3>
+      <div class="state-row"><span class="state-key">Задача</span><span id="s-task">—</span></div>
+      <div class="state-row"><span class="state-key">Шаг i</span><span id="s-i">—</span></div>
+      <div class="state-row"><span class="state-key">dp[i]</span><span id="s-dp">—</span></div>
+    </div>
+    <div id="step-desc">Нажмите <b>Запустить</b>.</div>
+  </div>
+</main>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="../shared/engine.js"></script>
+<script src="algo.js"></script>
+</body>
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>13 — Стек на связном списке</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../shared/base.css">
+</head>
+<body>
+<header>
+  <a href="../index.html" class="back-link">← Все алгоритмы</a>
+  <h1>13 — <span>Стек на связном списке</span></h1>
+  <div class="complexity">
+    <span class="badge">Push/Pop: <b>O(1)</b></span>
+    <span class="badge">Память: <b>O(n)</b></span>
+  </div>
+</header>
+<main>
+  <div id="left-panel">
+    <div id="controls"></div>
+    <div id="canvas-wrap">
+      <svg id="viz-svg" viewBox="0 0 700 340"></svg>
+      <div class="canvas-hint">push(3) push(7) push(1) pop() push(5) pop()</div>
+    </div>
+  </div>
+  <div id="right-panel">
+    <div id="pseudo"><h3>Псевдокод</h3></div>
+    <div id="state-panel">
+      <h3>Состояние</h3>
+      <div class="state-row"><span class="state-key">Размер</span><span id="s-size">0</span></div>
+      <div class="state-row"><span class="state-key">TOP</span><span id="s-top">—</span></div>
+      <div class="state-row"><span class="state-key">Операция</span><span id="s-op">—</span></div>
+    </div>
+    <div id="step-desc">Нажмите <b>Запустить</b>.</div>
+  </div>
+</main>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="../shared/engine.js"></script>
+<script src="algo.js"></script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>03 — Сортировка вставками</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../shared/base.css">
+</head>
+<body>
+<header>
+  <a href="../index.html" class="back-link">← Все алгоритмы</a>
+  <h1>03 — <span>Сортировка вставками</span></h1>
+  <div class="complexity">
+    <span class="badge">Время: <b>O(n²)</b></span>
+    <span class="badge">Память: <b>O(1)</b></span>
+  </div>
+</header>
+<main>
+  <div id="left-panel">
+    <div id="controls"></div>
+    <div style="padding:10px 12px 0;display:flex;gap:8px;align-items:center">
+      <input type="text" id="arr-input"
+        style="flex:1;background:#111;border:1px solid #303030;border-radius:5px;
+               color:#efefef;padding:7px 11px;font-family:'JetBrains Mono',monospace;
+               font-size:13px;outline:none;transition:border-color .15s"
+        onfocus="this.style.borderColor='#c8973e'"
+        onblur="this.style.borderColor='#303030'">
+      <span style="font-size:11px;color:#585858;white-space:nowrap">← изменить, затем ▶</span>
+    </div>
+    <div id="canvas-wrap">
+      <svg id="viz-svg"></svg>
+      <div class="canvas-hint">Введите свой массив выше и нажмите Запустить</div>
+    </div>
+  </div>
+  <div id="right-panel">
+    <div id="pseudo"><h3>Псевдокод</h3></div>
+    <div id="state-panel">
+      <h3>Состояние</h3>
+      <div class="state-row"><span class="state-key">Сравнений</span><span id="s-cmp">0</span></div>
+      <div class="state-row"><span class="state-key">Сдвигов</span><span id="s-shift">0</span></div>
+      <div class="state-row"><span class="state-key">Ключ</span><span id="s-key">—</span></div>
+    </div>
+    <div id="step-desc">Нажмите <b>Запустить</b>.</div>
+  </div>
+</main>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="../shared/engine.js"></script>
+<script src="algo.js"></script>
+</body>
+</html>
