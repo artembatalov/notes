@@ -1,231 +1,129 @@
 document.addEventListener('DOMContentLoaded', () => {
   buildStdControls();
-
   const svg = d3.select('#viz-svg');
-  svg.attr('viewBox', '0 0 700 400');
+  svg.attr('viewBox','0 0 700 420');
 
-  const INITIAL_ARR = [170, 45, 75, 90, 802, 24, 2, 66];
-  const N = INITIAL_ARR.length;
-  const DIGIT_NAMES = ['единицы', 'десятки', 'сотни'];
+  const DEFAULT_ARR = [170, 45, 75, 90, 802, 24, 2, 66];
 
-  // Layout
-  const MAIN_Y = 20;
-  const BOX_W = 60, BOX_H = 36, BOX_GAP = 6;
-  const MAIN_START_X = 25;
-  const BUCKET_START_Y = 80;
-  const BUCKET_ROW_H = 32;
-  const BUCKET_LABEL_X = 10;
-  const BUCKET_BOX_START = 35;
-  const BUCKET_BOX_W = 52, BUCKET_BOX_H = 26, BUCKET_BOX_GAP = 4;
-
-  function getDigit(num, pos) {
-    return Math.floor(num / Math.pow(10, pos)) % 10;
+  function getArr() {
+    const raw = document.getElementById('arr-input')?.value || '';
+    const p = raw.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n) && n > 0 && n <= 9999);
+    return p.length >= 2 ? p : [...DEFAULT_ARR];
   }
 
-  function pad3(n) { return String(n).padStart(3, ' '); }
-
-  // ── Rendering ───────────────────────────────────────────────
-
-  function renderMain(mainArr, hlMain, digitPos) {
-    const data = mainArr.map((v, i) => ({ v, i }));
-    const grp = svg.selectAll('g.main-box').data(data, d => d.i);
-    const enter = grp.enter().append('g').attr('class', 'main-box');
-    enter.append('rect');
-    enter.append('text').attr('class', 'main-digits');
-
-    const all = grp.merge(enter);
-    all.each(function(d) {
-      const x = MAIN_START_X + d.i * (BOX_W + BOX_GAP);
-      const col = hlMain[d.i] === 'active' ? '#c8973e'
-                : hlMain[d.i] === 'done'   ? '#3a6a52'
-                : '#2a2a2a';
-      const stroke = hlMain[d.i] ? '#c8973e' : '#444';
-
-      d3.select(this).select('rect')
-        .attr('x', x).attr('y', MAIN_Y)
-        .attr('width', BOX_W).attr('height', BOX_H)
-        .attr('fill', col).attr('stroke', stroke).attr('rx', 3);
-
-      // Draw digits with highlighted position
-      const numStr = String(d.v).padStart(3, '0');
-      const textEl = d3.select(this).select('.main-digits');
-      textEl.selectAll('*').remove();
-      textEl.attr('x', x + 4).attr('y', MAIN_Y + BOX_H / 2 + 4)
-        .attr('font-size', 12).attr('font-weight', 700)
-        .attr('font-family', 'JetBrains Mono, monospace');
-
-      // digitPos: 0=units(rightmost char index 2), 1=tens(1), 2=hundreds(0)
-      const hlCharIdx = 2 - digitPos; // char index in padded 3-char string
-
-      for (let ci = 0; ci < 3; ci++) {
-        const ch = numStr[ci];
-        const isHL = (digitPos !== undefined) && (ci === hlCharIdx);
-        textEl.append('tspan')
-          .attr('fill', isHL ? '#c8973e' : (col === '#2a2a2a' ? '#888' : '#111'))
-          .attr('font-weight', isHL ? 700 : 400)
-          .text(ch);
-      }
-    });
-    grp.exit().remove();
+  function setInputVal(arr) {
+    const el = document.getElementById('arr-input');
+    if (el) el.value = arr.join(', ');
   }
-
-  function renderBuckets(buckets, hlBucket) {
-    // 10 bucket rows (0..9)
-    for (let b = 0; b < 10; b++) {
-      const y = BUCKET_START_Y + b * BUCKET_ROW_H;
-      const rowId = `bucket-row-${b}`;
-
-      // Lane label
-      svg.selectAll(`text.${rowId}-lbl`).data([b]).join('text')
-        .attr('class', `${rowId}-lbl`)
-        .attr('x', BUCKET_LABEL_X).attr('y', y + BUCKET_BOX_H / 2 + 4)
-        .attr('font-size', 10).attr('fill', '#585858')
-        .attr('font-family', 'JetBrains Mono, monospace')
-        .text(`${b}:`);
-
-      // Bucket items
-      const items = buckets[b] || [];
-      const itemData = items.map((v, i) => ({ v, i, b }));
-      const sel = svg.selectAll(`g.bucket-item-${b}`).data(itemData, d => d.i);
-      const enter = sel.enter().append('g').attr('class', `bucket-item-${b}`);
-      enter.append('rect');
-      enter.append('text').attr('class', 'bi-val');
-
-      const all = sel.merge(enter);
-      all.each(function(d) {
-        const x = BUCKET_BOX_START + d.i * (BUCKET_BOX_W + BUCKET_BOX_GAP);
-        const isHL = hlBucket && hlBucket.b === b && hlBucket.i === d.i;
-        const col = isHL ? '#c8973e' : '#3a6a52';
-
-        d3.select(this).select('rect')
-          .attr('x', x).attr('y', y)
-          .attr('width', BUCKET_BOX_W).attr('height', BUCKET_BOX_H)
-          .attr('fill', col).attr('stroke', isHL ? '#c8973e' : '#444').attr('rx', 2);
-        d3.select(this).select('.bi-val')
-          .attr('x', x + BUCKET_BOX_W / 2).attr('y', y + BUCKET_BOX_H / 2 + 4)
-          .attr('text-anchor', 'middle').attr('font-size', 11).attr('font-weight', 700)
-          .attr('fill', '#111').attr('font-family', 'JetBrains Mono, monospace')
-          .text(d.v);
-      });
-      sel.exit().remove();
-    }
-  }
-
-  // ── Pseudocode ──────────────────────────────────────────────
 
   VizCode.init([
-    { id: 0,  html: '<span class="kw">function</span> <span class="fn">radixSort</span>(A, n, d):' },
-    { id: 1,  html: '  <span class="kw">for</span> pos = <span class="num">0</span> to d-1: <span class="cm">// разряд</span>' },
-    { id: 2,  html: '    <span class="fn">countingSort</span>(A, n, pos)' },
-    { id: 3,  html: '' },
-    { id: 4,  html: '<span class="kw">function</span> <span class="fn">countingSort</span>(A, n, pos):' },
-    { id: 5,  html: '  buckets = [[] for _ in <span class="num">0</span>..<span class="num">9</span>]' },
-    { id: 6,  html: '  <span class="kw">for</span> i = <span class="num">0</span> to n-1: <span class="cm">// распределяем</span>' },
-    { id: 7,  html: '    d = digit(A[i], pos)' },
-    { id: 8,  html: '    buckets[d].push(A[i])' },
-    { id: 9,  html: '  <span class="kw">for</span> b = <span class="num">0</span> to <span class="num">9</span>: <span class="cm">// собираем</span>' },
-    { id: 10, html: '    <span class="kw">for</span> x in buckets[b]: A[out++] = x' },
+    {id:0, html:'<span class="kw">function</span> <span class="fn">radixSort</span>(A, n, d):'},
+    {id:1, html:'  <span class="kw">for</span> digit = 0 to d-1:'},
+    {id:2, html:'    <span class="cm">// Стабильная сортировка по digit-му разряду</span>'},
+    {id:3, html:'    countingSort(A, n, base=10, key=digit)'},
+    {id:4, html:'<span class="cm">// d=3 разряда, k=10, стабильность = ключ</span>'},
   ]);
 
-  // ── Steps ───────────────────────────────────────────────────
+  function getDigit(num, d) {
+    return Math.floor(num / Math.pow(10, d)) % 10;
+  }
 
-  function buildSteps() {
-    const steps = [];
-    let arr = [...INITIAL_ARR];
+  function render(mainArr, buckets, digitPos, highlightMain, step) {
+    svg.selectAll('*').remove();
+    const n = mainArr.length;
+    const bw = Math.min(64, Math.floor(690 / n));
+    const bh = 34;
+    const gap = 4;
+    const sx = (700 - n*(bw+gap) + gap) / 2;
+    const y0 = 20;
 
-    function push(opts) {
-      steps.push({
-        mainArr: [...(opts.mainArr || arr)],
-        hlMain: opts.hlMain || {},
-        buckets: opts.buckets || Array.from({ length: 10 }, () => []),
-        hlBucket: opts.hlBucket || null,
-        digitPos: opts.digitPos !== undefined ? opts.digitPos : null,
-        line: opts.line || [],
-        desc: opts.desc || '',
-        digit: opts.digit || '—',
-        substep: opts.substep || '—',
+    // Digit position label
+    svg.append('text').attr('x',350).attr('y',14).attr('text-anchor','middle').attr('font-size',12)
+      .attr('fill','#585858')
+      .text(digitPos === 0 ? 'Разряд: единицы' : digitPos === 1 ? 'Разряд: десятки' : 'Разряд: сотни');
+
+    // Main array numbers
+    mainArr.forEach((v,i) => {
+      const x = sx + i*(bw+gap);
+      const hl = highlightMain[i];
+      svg.append('rect').attr('x',x).attr('y',y0).attr('width',bw).attr('height',bh).attr('rx',6)
+        .attr('fill', hl==='active' ? '#6a4000' : hl==='done' ? '#2d5e3e' : '#1e1e1e')
+        .attr('stroke', hl ? '#c8973e' : '#333');
+
+      const str = String(v).padStart(3,'0');
+      const tx = x + bw/2;
+      const ty = y0 + bh/2 + 6;
+      const t = svg.append('text').attr('x',tx).attr('y',ty).attr('text-anchor','middle')
+        .attr('font-size',13).attr('font-weight',700).attr('font-family',"'JetBrains Mono',monospace");
+
+      const chars = str.split('');
+      chars.forEach((ch,ci) => {
+        // units=pos0=rightmost=index2, tens=pos1=index1, hundreds=pos2=index0
+        const isTarget = (2 - ci) === digitPos;
+        t.append('tspan').attr('fill', isTarget ? '#c8973e' : '#666').text(ch);
       });
-    }
-
-    // Initial state
-    push({ mainArr: arr, desc: 'Исходный массив. Начинаем с разряда единиц.', digit: '—', substep: 'Старт' });
-
-    for (let pos = 0; pos < 3; pos++) {
-      const digitName = DIGIT_NAMES[pos];
-
-      // Show which digit position we're processing
-      push({
-        mainArr: arr,
-        hlMain: {},
-        buckets: Array.from({ length: 10 }, () => []),
-        digitPos: pos,
-        line: [1, 2],
-        desc: `Разряд: <b>${digitName}</b> (позиция ${pos}). Распределяем по вёдрам.`,
-        digit: digitName, substep: 'Инициализация вёдер',
-      });
-
-      const buckets = Array.from({ length: 10 }, () => []);
-
-      // Distribute into buckets
-      for (let i = 0; i < N; i++) {
-        const num = arr[i];
-        const d = getDigit(num, pos);
-
-        push({
-          mainArr: arr,
-          hlMain: { [i]: 'active' },
-          buckets: buckets.map(b => [...b]),
-          hlBucket: null,
-          digitPos: pos,
-          line: [6, 7, 8],
-          desc: `arr[${i}]=<b>${num}</b>: разряд «${digitName}» = <b>${d}</b> → ведро ${d}`,
-          digit: digitName, substep: `Помещаем ${num} в ведро ${d}`,
-        });
-
-        buckets[d].push(num);
-
-        push({
-          mainArr: arr,
-          hlMain: { [i]: 'done' },
-          buckets: buckets.map(b => [...b]),
-          hlBucket: { b: d, i: buckets[d].length - 1 },
-          digitPos: pos,
-          line: [8],
-          desc: `buckets[${d}] = [${buckets[d].join(', ')}]`,
-          digit: digitName, substep: `Ведро ${d} обновлено`,
-        });
-      }
-
-      // Collect back
-      const newArr = [];
-      for (let b = 0; b < 10; b++) {
-        for (const v of buckets[b]) newArr.push(v);
-      }
-
-      push({
-        mainArr: newArr,
-        hlMain: Object.fromEntries(newArr.map((_, i) => [i, 'done'])),
-        buckets: buckets.map(b => [...b]),
-        hlBucket: null,
-        digitPos: pos,
-        line: [9, 10],
-        desc: `Собираем из вёдер 0..9 → [${newArr.join(', ')}]`,
-        digit: digitName, substep: 'Сборка из вёдер',
-      });
-
-      arr = newArr;
-    }
-
-    // Final
-    push({
-      mainArr: arr,
-      hlMain: Object.fromEntries(arr.map((_, i) => [i, 'done'])),
-      buckets: Array.from({ length: 10 }, () => []),
-      digitPos: null,
-      line: [],
-      desc: '<span class="ok">Массив отсортирован!</span>',
-      digit: '—', substep: 'Готово',
     });
+
+    // Buckets (show if step has bucket data)
+    if (buckets) {
+      const bucketY = 70;
+      const laneH = 30;
+      for (let b = 0; b < 10; b++) {
+        const by = bucketY + b*laneH;
+        svg.append('text').attr('x',12).attr('y',by+laneH/2+5).attr('font-size',11)
+          .attr('fill','#555').attr('font-weight',700).text(b+':');
+        const items = buckets[b] || [];
+        items.forEach((v,idx) => {
+          const bx = 30 + idx*(40+3);
+          const isNewlyPlaced = step && step.placingBucket === b && step.placingIdx === idx;
+          svg.append('rect').attr('x',bx).attr('y',by+2).attr('width',40).attr('height',laneH-4).attr('rx',4)
+            .attr('fill', isNewlyPlaced ? '#c8973e' : '#252525').attr('stroke','#333');
+          svg.append('text').attr('x',bx+20).attr('y',by+laneH-8).attr('text-anchor','middle')
+            .attr('font-size',12).attr('font-weight',700)
+            .attr('font-family',"'JetBrains Mono',monospace")
+            .attr('fill', isNewlyPlaced ? '#111' : '#aaa').text(v);
+        });
+      }
+    }
+  }
+
+  function buildSteps(inputArr) {
+    const arr = [...inputArr];
+    const n = arr.length;
+    const steps = [];
+    const emptyBuckets = () => Array.from({length:10}, () => []);
+
+    steps.push({arr:[...arr], buckets:null, highlightMain:{}, digitPos:0,
+      desc:'Поразрядная сортировка (LSD). Три прохода: единицы → десятки → сотни.'});
+
+    for (let d = 0; d < 3; d++) {
+      const label = d === 0 ? 'единицы' : d === 1 ? 'десятки' : 'сотни';
+      steps.push({line:[1], arr:[...arr], buckets:null, highlightMain:{}, digitPos:d,
+        desc:`<b>Проход ${d+1}</b>: сортируем по разряду "${label}"`});
+
+      const buckets = emptyBuckets();
+      for (let i = 0; i < n; i++) {
+        const dig = getDigit(arr[i], d);
+        steps.push({line:[3], arr:[...arr], buckets:buckets.map(b => [...b]),
+          highlightMain:{[i]:'active'}, digitPos:d,
+          placingBucket:dig, placingIdx:buckets[dig].length,
+          desc:`A[${i}]=${arr[i]}: разряд="${label}"=${dig} → ведро ${dig}`});
+        buckets[dig].push(arr[i]);
+        steps.push({line:[3], arr:[...arr], buckets:buckets.map(b => [...b]),
+          highlightMain:{}, digitPos:d,
+          desc:`${arr[i]} помещён в ведро ${dig}`});
+      }
+
+      let pos = 0;
+      for (let b = 0; b < 10; b++) for (const v of buckets[b]) arr[pos++] = v;
+
+      steps.push({line:[], arr:[...arr], buckets:null, highlightMain:{}, digitPos:d,
+        desc:`Собираем из вёдер 0..9. Массив после прохода по "${label}": [${arr.join(', ')}]`});
+    }
+
+    steps.push({line:[], arr:[...arr], buckets:null,
+      highlightMain:Object.fromEntries(arr.map((_,i) => [i,'done'])), digitPos:2,
+      desc:'Массив полностью отсортирован!'});
 
     return steps;
   }
@@ -233,18 +131,26 @@ document.addEventListener('DOMContentLoaded', () => {
   function applyStep(step) {
     VizCode.highlight(step.line || []);
     VizState.setDesc(step.desc || '');
-    renderMain(step.mainArr, step.hlMain || {}, step.digitPos);
-    renderBuckets(step.buckets || Array.from({ length: 10 }, () => []), step.hlBucket);
-    document.getElementById('s-digit').textContent = step.digit || '—';
-    document.getElementById('s-substep').textContent = step.substep || '—';
+    render(step.arr, step.buckets, step.digitPos || 0, step.highlightMain || {}, step);
+    document.getElementById('s-digit').textContent =
+      step.digitPos === 0 ? 'единицы' : step.digitPos === 1 ? 'десятки' : 'сотни';
+    document.getElementById('s-substep').textContent =
+      step.desc ? step.desc.replace(/<[^>]+>/g,'').slice(0,40) : '—';
   }
 
   function run() {
-    const steps = buildSteps();
-    VizAnim.init(steps, applyStep);
+    const arr = getArr();
+    setInputVal(arr);
+    const steps = buildSteps(arr);
+    VizAnim.init([
+      {arr:[...arr], buckets:null, highlightMain:{}, digitPos:0,
+        desc:'Измените массив и нажмите <b>Запустить</b>.'},
+      ...steps
+    ], applyStep);
     VizAnim.reset();
   }
 
   VizAnim.bindUI(run);
+  setInputVal(DEFAULT_ARR);
   run();
 });

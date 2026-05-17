@@ -1,22 +1,18 @@
 document.addEventListener('DOMContentLoaded', () => {
   buildStdControls();
-
   const svg = d3.select('#viz-svg');
-  svg.attr('viewBox', '0 0 700 360');
-
-  // Arrow marker definition
+  svg.attr('viewBox','0 0 700 360');
   const defs = svg.append('defs');
-  defs.append('marker')
-    .attr('id', 'arr-amber').attr('markerWidth', 8).attr('markerHeight', 8)
-    .attr('refX', 6).attr('refY', 3).attr('orient', 'auto')
-    .append('path').attr('d', 'M0,0 L0,6 L8,3 Z').attr('fill', '#c8973e');
+  defs.append('marker').attr('id','arr-amber').attr('markerWidth',8).attr('markerHeight',8)
+    .attr('refX',6).attr('refY',3).attr('orient','auto')
+    .append('path').attr('d','M0,0 L0,6 L8,3 Z').attr('fill','#c8973e');
 
   const DEFAULT_ARR = [5, 3, 8, 1, 9, 2, 7, 4];
 
   function getArr() {
     const raw = document.getElementById('arr-input')?.value || '';
-    const parsed = raw.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n) && n > 0 && n <= 99);
-    return parsed.length >= 2 ? parsed : [...DEFAULT_ARR];
+    const p = raw.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n) && n > 0 && n <= 99);
+    return p.length >= 2 ? p : [...DEFAULT_ARR];
   }
 
   function setInputVal(arr) {
@@ -24,160 +20,113 @@ document.addEventListener('DOMContentLoaded', () => {
     if (el) el.value = arr.join(', ');
   }
 
-  setInputVal(DEFAULT_ARR);
-
-  const colors = {
-    default:  { fill: '#1e1e1e', text: '#666' },
-    key:      { fill: '#c8973e', text: '#111' },
-    compare:  { fill: '#4a7fa8', text: '#fff' },
-    sorted:   { fill: '#2d5e3e', text: '#7fc999' },
-    pivot:    { fill: '#8b3a3a', text: '#f5a0a0' },
-    less:     { fill: '#2a5080', text: '#9dc8f0' },
-    greater:  { fill: '#4a3a70', text: '#b09ee0' },
-    placed:   { fill: '#2d6e4e', text: '#7fffc4' },
-    active:   { fill: '#c8973e', text: '#111' },
-    shift:    { fill: '#5a4a90', text: '#c0b0ff' },
-    done:     { fill: '#3a6a52', text: '#efefef' },
+  const COLORS = {
+    default: {fill:'#1e1e1e', text:'#555'},
+    key:     {fill:'#c8973e', text:'#111'},
+    compare: {fill:'#4a7fa8', text:'#fff'},
+    sorted:  {fill:'#2d5e3e', text:'#7fc999'},
+    shift:   {fill:'#5a4a90', text:'#c0b0ff'},
+    insert:  {fill:'#2d6e4e', text:'#7fffc4'},
   };
 
-  function renderArray(svg, arr, highlights, swapPair, y) {
-    y = y !== undefined ? y : 160;
+  function renderArray(arr, highlights, swapPair, y) {
+    y = y || 150;
     const n = arr.length;
-    const BOX_W = 58, BOX_H = 50, GAP = 10;
-    const totalW = n * (BOX_W + GAP) - GAP;
+    const BOX_W = Math.min(58, Math.floor((680 - 8*(n-1)) / n));
+    const BOX_H = 50, GAP = 8;
+    const totalW = n*(BOX_W+GAP) - GAP;
     const startX = (700 - totalW) / 2;
 
-    // Clear swap arcs
     svg.selectAll('.swap-arc').remove();
-
-    // Draw swap arc
-    if (swapPair && swapPair.length === 2) {
-      const [si, sj] = swapPair;
-      const xi = startX + si * (BOX_W + GAP) + BOX_W / 2;
-      const xj = startX + sj * (BOX_W + GAP) + BOX_W / 2;
-      const mx = (xi + xj) / 2;
-      const cy = y - 38;
-      svg.append('path').attr('class', 'swap-arc')
-        .attr('d', `M ${xi} ${y - 2} Q ${mx} ${cy} ${xj} ${y - 2}`)
-        .attr('fill', 'none').attr('stroke', '#c8973e')
-        .attr('stroke-width', 1.5).attr('marker-end', 'url(#arr-amber)');
+    if (swapPair && swapPair.length === 2 && swapPair[0] !== swapPair[1]) {
+      const [i,j] = swapPair;
+      const xi = startX + i*(BOX_W+GAP) + BOX_W/2;
+      const xj = startX + j*(BOX_W+GAP) + BOX_W/2;
+      const mx = (xi+xj)/2;
+      const arcH = Math.max(30, Math.abs(xi-xj)*0.35);
+      svg.append('path').attr('class','swap-arc')
+        .attr('d',`M ${xi} ${y-2} Q ${mx} ${y-arcH} ${xj} ${y-2}`)
+        .attr('fill','none').attr('stroke','#c8973e').attr('stroke-width',1.5)
+        .attr('marker-end','url(#arr-amber)');
     }
 
-    // Boxes
-    const grp = svg.selectAll('g.elem').data(arr.map((v, i) => ({ v, i })));
-    const enter = grp.enter().append('g').attr('class', 'elem');
+    const grp = svg.selectAll('g.elem').data(arr.map((v,i) => ({v,i})));
+    const enter = grp.enter().append('g').attr('class','elem');
     enter.append('rect');
-    enter.append('text').attr('class', 'val');
-    enter.append('text').attr('class', 'idx');
-    const all = grp.merge(enter);
+    enter.append('text').attr('class','val');
+    enter.append('text').attr('class','idx');
 
-    all.each(function(d) {
-      const x = startX + d.i * (BOX_W + GAP);
-      const col = colors[highlights[d.i]] || colors.default;
-      const g = d3.select(this);
-      g.select('rect')
-        .attr('x', x).attr('y', y)
-        .attr('width', BOX_W).attr('height', BOX_H)
-        .attr('rx', 8).attr('fill', col.fill)
-        .attr('stroke', '#333').attr('stroke-width', 1);
-      g.select('.val')
-        .attr('x', x + BOX_W / 2).attr('y', y + BOX_H / 2 + 6)
-        .attr('text-anchor', 'middle')
-        .attr('font-size', 18).attr('font-weight', 700)
-        .attr('font-family', "'JetBrains Mono',monospace")
-        .attr('fill', col.text).text(d.v);
-      g.select('.idx')
-        .attr('x', x + BOX_W / 2).attr('y', y + BOX_H + 14)
-        .attr('text-anchor', 'middle')
-        .attr('font-size', 10).attr('fill', '#444').text(d.i);
+    grp.merge(enter).each(function(d) {
+      const x = startX + d.i*(BOX_W+GAP);
+      const col = COLORS[highlights[d.i]] || COLORS.default;
+      const isHl = highlights[d.i] && highlights[d.i] !== 'default';
+      d3.select(this).select('rect')
+        .attr('x',x).attr('y',y).attr('width',BOX_W).attr('height',BOX_H).attr('rx',8)
+        .attr('fill',col.fill).attr('stroke',isHl ? col.fill : '#333').attr('stroke-width',isHl ? 2 : 1);
+      d3.select(this).select('.val')
+        .attr('x',x+BOX_W/2).attr('y',y+BOX_H/2+7)
+        .attr('text-anchor','middle').attr('font-size',Math.min(18,BOX_W-10))
+        .attr('font-weight',700).attr('font-family',"'JetBrains Mono',monospace")
+        .attr('fill',col.text).text(d.v);
+      d3.select(this).select('.idx')
+        .attr('x',x+BOX_W/2).attr('y',y+BOX_H+15)
+        .attr('text-anchor','middle').attr('font-size',10).attr('fill','#3a3a3a').text(d.i);
     });
     grp.exit().remove();
   }
 
   VizCode.init([
-    { id: 0, html: '<span class="kw">function</span> <span class="fn">insertionSort</span>(A, n):' },
-    { id: 1, html: '  <span class="kw">for</span> i = <span class="num">1</span> to n-1:' },
-    { id: 2, html: '    key = A[i]' },
-    { id: 3, html: '    j = i - <span class="num">1</span>' },
-    { id: 4, html: '    <span class="kw">while</span> j >= <span class="num">0</span> <span class="kw">and</span> A[j] > key:' },
-    { id: 5, html: '      A[j+<span class="num">1</span>] = A[j]' },
-    { id: 6, html: '      j = j - <span class="num">1</span>' },
-    { id: 7, html: '    A[j+<span class="num">1</span>] = key' },
+    {id:0, html:'<span class="kw">function</span> <span class="fn">insertionSort</span>(A, n):'},
+    {id:1, html:'  <span class="kw">for</span> i = <span class="num">1</span> <span class="kw">to</span> n-1:'},
+    {id:2, html:'    key = A[i]; j = i-1'},
+    {id:3, html:'    <span class="kw">while</span> j >= 0 <span class="kw">and</span> A[j] > key:'},
+    {id:4, html:'      A[j+1] = A[j]; j = j - 1'},
+    {id:5, html:'    A[j+1] = key'},
   ]);
 
-  function buildSteps(arr) {
-    arr = [...arr];
+  function buildSteps(inputArr) {
+    const arr = [...inputArr];
+    const n = arr.length;
     const steps = [];
     let cmp = 0, shift = 0;
 
-    const mkHL = (highlights, sorted_count) => {
+    const sortedHL = (upTo) => {
       const h = {};
-      for (let k = 0; k < sorted_count; k++) h[k] = 'sorted';
-      Object.assign(h, highlights);
+      for (let k = 0; k <= upTo; k++) h[k] = 'sorted';
       return h;
     };
 
-    for (let i = 1; i < arr.length; i++) {
-      const key = arr[i];
+    steps.push({line:[], arr:[...arr], highlights:{}, swapPair:null, cmp, shift, key:'—',
+      desc:'Массив готов. Начинаем сортировку вставками.'});
 
-      steps.push({
-        arr: [...arr],
-        highlights: mkHL({ [i]: 'key' }, i),
-        line: [1, 2, 3],
-        desc: `i=${i}: берём ключ arr[${i}]=<b>${key}</b>`,
-        cmp, shift, key: `arr[${i}]=${key}`,
-        swapPair: null,
-      });
+    for (let i = 1; i < n; i++) {
+      const key = arr[i];
+      const hl0 = {...sortedHL(i-1), [i]:'key'};
+      steps.push({line:[1,2], arr:[...arr], highlights:hl0, swapPair:null, cmp, shift, key,
+        desc:`i=${i}: берём ключ <b>${key}</b> = A[${i}]`});
 
       let j = i - 1;
       while (j >= 0 && arr[j] > key) {
         cmp++;
-        steps.push({
-          arr: [...arr],
-          highlights: mkHL({ [i]: 'key', [j]: 'compare' }, i),
-          line: [4],
-          desc: `arr[${j}]=<b>${arr[j]}</b> > key=<b>${key}</b> → сдвигаем вправо`,
-          cmp, shift, key: `arr[${i}]=${key}`,
-          swapPair: null,
-        });
-
-        arr[j + 1] = arr[j];
+        const hl1 = {...sortedHL(j-1), [j]:'compare', [i]:'key'};
+        steps.push({line:[3], arr:[...arr], highlights:hl1, swapPair:null, cmp, shift, key,
+          desc:`A[${j}]=${arr[j]} > key=${key} → сдвигаем вправо`});
+        arr[j+1] = arr[j];
         shift++;
-        steps.push({
-          arr: [...arr],
-          highlights: mkHL({ [j + 1]: 'shift', [j]: 'compare' }, i),
-          line: [5, 6],
-          desc: `Сдвиг: arr[${j + 1}] = arr[${j}] = <b>${arr[j]}</b>`,
-          cmp, shift, key: `arr[${i}]=${key}`,
-          swapPair: null,
-        });
+        const hl2 = {...sortedHL(j-1), [j+1]:'shift'};
+        steps.push({line:[4], arr:[...arr], highlights:hl2, swapPair:null, cmp, shift, key,
+          desc:`A[${j+1}] = A[${j}] = ${arr[j+1]}`});
         j--;
       }
 
-      arr[j + 1] = key;
-      const insertHL = {};
-      for (let k = 0; k <= i; k++) insertHL[k] = 'sorted';
-      insertHL[j + 1] = 'key';
-      steps.push({
-        arr: [...arr],
-        highlights: insertHL,
-        line: [7],
-        desc: `Вставляем key=<b>${key}</b> на позицию <b>${j + 1}</b>`,
-        cmp, shift, key: `pos=${j + 1}`,
-        swapPair: null,
-      });
+      arr[j+1] = key;
+      const hl3 = {...sortedHL(i), [j+1]:'insert'};
+      steps.push({line:[5], arr:[...arr], highlights:hl3, swapPair:null, cmp, shift, key,
+        desc:`Вставляем key=${key} на позицию ${j+1}`});
     }
 
-    const allSorted = {};
-    arr.forEach((_, k) => { allSorted[k] = 'sorted'; });
-    steps.push({
-      arr: [...arr],
-      highlights: allSorted,
-      line: [],
-      desc: '<span class="ok">Массив отсортирован!</span>',
-      cmp, shift, key: '—',
-      swapPair: null,
-    });
+    steps.push({line:[], arr:[...arr], highlights:sortedHL(n-1), swapPair:null, cmp, shift, key:'—',
+      desc:`Готово! Сравнений: ${cmp}, сдвигов: ${shift}.`});
 
     return steps;
   }
@@ -185,22 +134,26 @@ document.addEventListener('DOMContentLoaded', () => {
   function applyStep(step) {
     VizCode.highlight(step.line || []);
     VizState.setDesc(step.desc || '');
-    renderArray(svg, step.arr, step.highlights || {}, step.swapPair || null);
-    document.getElementById('s-cmp').textContent = step.cmp !== undefined ? step.cmp : 0;
-    document.getElementById('s-shift').textContent = step.shift !== undefined ? step.shift : 0;
-    document.getElementById('s-key').textContent = step.key || '—';
+    svg.selectAll('g.elem').remove();
+    renderArray(step.arr, step.highlights, step.swapPair);
+    document.getElementById('s-cmp').textContent = step.cmp;
+    document.getElementById('s-shift').textContent = step.shift;
+    document.getElementById('s-key').textContent = step.key;
   }
 
   function run() {
     const arr = getArr();
+    setInputVal(arr);
     const steps = buildSteps(arr);
     VizAnim.init([
-      { line: [], desc: 'Готово. Можно изменить массив выше и нажать <b>Запустить</b>.', arr: [...arr], highlights: {}, swapPair: null, cmp: 0, shift: 0, key: '—' },
+      {line:[], arr:[...arr], highlights:{}, swapPair:null, cmp:0, shift:0, key:'—',
+        desc:'Измените массив выше и нажмите <b>Запустить</b>.'},
       ...steps
     ], applyStep);
     VizAnim.reset();
   }
 
   VizAnim.bindUI(run);
+  setInputVal(DEFAULT_ARR);
   run();
 });

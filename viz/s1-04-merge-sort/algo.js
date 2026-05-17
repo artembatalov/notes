@@ -1,154 +1,137 @@
 document.addEventListener('DOMContentLoaded', () => {
   buildStdControls();
-
   const svg = d3.select('#viz-svg');
-  svg.attr('viewBox', '0 0 700 360');
+  svg.attr('viewBox','0 0 700 380');
+  const defs = svg.append('defs');
+  defs.append('marker').attr('id','arr-amber').attr('markerWidth',8).attr('markerHeight',8)
+    .attr('refX',6).attr('refY',3).attr('orient','auto')
+    .append('path').attr('d','M0,0 L0,6 L8,3 Z').attr('fill','#c8973e');
 
   const DEFAULT_ARR = [5, 3, 8, 1, 9, 2, 7, 4];
-  const barW = 52, gap = 10, startX = 55, baseY = 300, maxH = 220;
 
-  const colorMap = {
-    left:    '#6a9fd4',
-    right:   '#5a9a72',
-    active:  '#c8973e',
-    placed:  '#5a9a72',
-    done:    '#3a6a52',
-    default: '#2a2a2a',
+  function getArr() {
+    const raw = document.getElementById('arr-input')?.value || '';
+    const p = raw.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n) && n > 0 && n <= 99);
+    return p.length >= 2 ? p : [...DEFAULT_ARR];
+  }
+
+  function setInputVal(arr) {
+    const el = document.getElementById('arr-input');
+    if (el) el.value = arr.join(', ');
+  }
+
+  const COLORS = {
+    default: {fill:'#1e1e1e', text:'#555'},
+    sorted:  {fill:'#2d5e3e', text:'#7fc999'},
+    compare: {fill:'#4a7fa8', text:'#fff'},
+    placed:  {fill:'#2d6e4e', text:'#7fffc4'},
+    left:    {fill:'#2a4060', text:'#9dc8f0'},
+    right:   {fill:'#2a5030', text:'#9fd4a0'},
   };
 
-  function renderBars(arrState, highlights) {
-    const maxVal = Math.max(...arrState);
-    const grp = svg.selectAll('g.bar').data(arrState, (d, i) => i);
-    const enter = grp.enter().append('g').attr('class', 'bar');
-    enter.append('rect');
-    enter.append('text').attr('class', 'val-label');
-    enter.append('text').attr('class', 'idx-label');
+  function renderArray(arr, highlights, label, y) {
+    y = y || 140;
+    const n = arr.length;
+    const BOX_W = Math.min(58, Math.floor((680 - 8*(n-1)) / n));
+    const BOX_H = 50, GAP = 8;
+    const totalW = n*(BOX_W+GAP) - GAP;
+    const startX = (700 - totalW) / 2;
 
-    const all = grp.merge(enter);
-    all.each(function(d, i) {
-      const x = startX + i * (barW + gap);
-      const h = d / maxVal * maxH;
-      const col = colorMap[highlights[i]] || '#2a2a2a';
+    svg.selectAll('.range-lbl').remove();
+    if (label) {
+      svg.append('text').attr('class','range-lbl')
+        .attr('x',350).attr('y',y+BOX_H+30)
+        .attr('text-anchor','middle').attr('font-size',12).attr('fill','#585858')
+        .text(label);
+    }
+
+    const grp = svg.selectAll('g.elem').data(arr.map((v,i) => ({v,i})));
+    const enter = grp.enter().append('g').attr('class','elem');
+    enter.append('rect');
+    enter.append('text').attr('class','val');
+    enter.append('text').attr('class','idx');
+
+    grp.merge(enter).each(function(d) {
+      const x = startX + d.i*(BOX_W+GAP);
+      const col = COLORS[highlights[d.i]] || COLORS.default;
+      const isHl = highlights[d.i] && highlights[d.i] !== 'default';
       d3.select(this).select('rect')
-        .attr('x', x).attr('y', baseY - h)
-        .attr('width', barW).attr('height', h)
-        .attr('fill', col).attr('stroke', '#444').attr('rx', 3);
-      d3.select(this).select('.val-label')
-        .attr('x', x + barW / 2).attr('y', baseY - h - 6)
-        .attr('text-anchor', 'middle').attr('font-size', 12)
-        .attr('fill', col === '#2a2a2a' ? '#888' : '#111').text(d);
-      d3.select(this).select('.idx-label')
-        .attr('x', x + barW / 2).attr('y', baseY + 16)
-        .attr('text-anchor', 'middle').attr('font-size', 10).attr('fill', '#585858').text(i);
+        .attr('x',x).attr('y',y).attr('width',BOX_W).attr('height',BOX_H).attr('rx',8)
+        .attr('fill',col.fill).attr('stroke',isHl ? col.fill : '#333').attr('stroke-width',isHl ? 2 : 1);
+      d3.select(this).select('.val')
+        .attr('x',x+BOX_W/2).attr('y',y+BOX_H/2+7)
+        .attr('text-anchor','middle').attr('font-size',Math.min(18,BOX_W-10))
+        .attr('font-weight',700).attr('font-family',"'JetBrains Mono',monospace")
+        .attr('fill',col.text).text(d.v);
+      d3.select(this).select('.idx')
+        .attr('x',x+BOX_W/2).attr('y',y+BOX_H+15)
+        .attr('text-anchor','middle').attr('font-size',10).attr('fill','#3a3a3a').text(d.i);
     });
     grp.exit().remove();
   }
 
   VizCode.init([
-    { id: 0,  html: '<span class="kw">function</span> <span class="fn">mergeSort</span>(A, n):' },
-    { id: 1,  html: '  width = <span class="num">1</span>' },
-    { id: 2,  html: '  <span class="kw">while</span> width < n:' },
-    { id: 3,  html: '    <span class="kw">for</span> lo = <span class="num">0</span>; lo < n; lo += 2*width:' },
-    { id: 4,  html: '      mid = min(lo+width-1, n-1)' },
-    { id: 5,  html: '      hi  = min(lo+2*width-1, n-1)' },
-    { id: 6,  html: '      <span class="fn">merge</span>(A, lo, mid, hi)' },
-    { id: 7,  html: '    width *= <span class="num">2</span>' },
-    { id: 8,  html: '' },
-    { id: 9,  html: '<span class="kw">function</span> <span class="fn">merge</span>(A, lo, mid, hi):' },
-    { id: 10, html: '  tmp = []' },
-    { id: 11, html: '  li = lo, ri = mid+<span class="num">1</span>' },
-    { id: 12, html: '  <span class="kw">while</span> li<=mid <span class="kw">and</span> ri<=hi:' },
-    { id: 13, html: '    <span class="kw">if</span> A[li] <= A[ri]: tmp.push(A[li++])' },
-    { id: 14, html: '    <span class="kw">else</span>: tmp.push(A[ri++])' },
-    { id: 15, html: '  <span class="cm">// copy remaining</span>' },
-    { id: 16, html: '  copy tmp back to A[lo..hi]' },
+    {id:0, html:'<span class="kw">function</span> <span class="fn">mergeSort</span>(A):'},
+    {id:1, html:'  <span class="cm">// Bottom-up: width 1, 2, 4, ...</span>'},
+    {id:2, html:'  <span class="kw">for</span> width = 1; width < n; width *= 2:'},
+    {id:3, html:'    <span class="kw">for</span> lo = 0; lo < n; lo += 2*width:'},
+    {id:4, html:'      mid = min(lo+width, n)-1'},
+    {id:5, html:'      hi  = min(lo+2*width, n)-1'},
+    {id:6, html:'      <span class="fn">merge</span>(A, lo, mid, hi)'},
+    {id:7, html:'<span class="fn">merge</span>(lo, mid, hi): сравниваем A[li] и A[ri]'},
   ]);
 
-  function buildSteps() {
-    const arr = [...DEFAULT_ARR];
+  function buildSteps(inputArr) {
+    const arr = [...inputArr];
     const n = arr.length;
     const steps = [];
     let cmp = 0;
-    const doneSet = new Set();
 
-    function mkHL(extra) {
-      const h = {};
-      doneSet.forEach(i => { h[i] = 'done'; });
-      Object.assign(h, extra);
-      return h;
-    }
+    steps.push({line:[], arr:[...arr], highlights:{}, rangeLabel:'', cmp,
+      desc:'Сортировка слиянием (снизу вверх). Начинаем с подмассивов ширины 1.'});
 
-    for (let width = 1; width < n; width *= 2) {
-      for (let lo = 0; lo < n; lo += 2 * width) {
-        const mid = Math.min(lo + width - 1, n - 1);
-        const hi = Math.min(lo + 2 * width - 1, n - 1);
+    for (let w = 1; w < n; w *= 2) {
+      for (let lo = 0; lo < n; lo += 2*w) {
+        const mid = Math.min(lo+w, n) - 1;
+        const hi  = Math.min(lo+2*w, n) - 1;
         if (mid >= hi) continue;
 
-        // Highlight left/right halves
-        const hlLR = {};
-        for (let k = lo; k <= mid; k++) hlLR[k] = 'left';
-        for (let k = mid + 1; k <= hi; k++) hlLR[k] = 'right';
+        const hl0 = {};
+        for (let k = lo; k <= mid; k++) hl0[k] = 'left';
+        for (let k = mid+1; k <= hi; k++) hl0[k] = 'right';
 
-        steps.push({
-          arr: [...arr], highlights: mkHL(hlLR),
-          line: [3, 4, 5, 6],
-          desc: `width=${width}: сливаем [${lo}..${mid}] (синий) и [${mid + 1}..${hi}] (зелёный)`,
-          width, range: `[${lo}..${hi}]`, cmp,
-        });
+        steps.push({line:[2,3], arr:[...arr], highlights:hl0,
+          rangeLabel:`Ширина ${w}: сливаем [${lo}..${mid}] + [${mid+1}..${hi}]`, cmp,
+          desc:`Сливаем: левая [${lo}..${mid}] (синяя) + правая [${mid+1}..${hi}] (зелёная)`});
 
-        // Perform merge
         const tmp = [];
         let li = lo, ri = mid + 1;
         while (li <= mid && ri <= hi) {
           cmp++;
-          const hlCmp = {};
-          for (let k = lo; k <= mid; k++) hlCmp[k] = 'left';
-          for (let k = mid + 1; k <= hi; k++) hlCmp[k] = 'right';
-          hlCmp[li] = 'active';
-          hlCmp[ri] = 'active';
-
-          steps.push({
-            arr: [...arr], highlights: mkHL(hlCmp),
-            line: [12, 13, 14],
-            desc: `Сравниваем arr[${li}]=<b>${arr[li]}</b> и arr[${ri}]=<b>${arr[ri]}</b>`,
-            width, range: `[${lo}..${hi}]`, cmp,
-          });
-
-          if (arr[li] <= arr[ri]) {
-            tmp.push(arr[li++]);
-          } else {
-            tmp.push(arr[ri++]);
-          }
+          const hl1 = {...hl0, [li]:'compare', [ri]:'compare'};
+          steps.push({line:[7], arr:[...arr], highlights:hl1,
+            rangeLabel:`Сравниваем arr[${li}]=${arr[li]} и arr[${ri}]=${arr[ri]}`, cmp,
+            desc:`Сравниваем <b>${arr[li]}</b> и <b>${arr[ri]}</b>`});
+          if (arr[li] <= arr[ri]) { tmp.push(arr[li++]); }
+          else { tmp.push(arr[ri++]); }
         }
         while (li <= mid) tmp.push(arr[li++]);
-        while (ri <= hi)  tmp.push(arr[ri++]);
+        while (ri <= hi) tmp.push(arr[ri++]);
 
-        // Copy back
-        for (let k = 0; k < tmp.length; k++) {
-          arr[lo + k] = tmp[k];
-          doneSet.add(lo + k);
-        }
+        tmp.forEach((v,k) => { arr[lo+k] = v; });
 
-        const hlDone = {};
-        for (let k = lo; k <= hi; k++) hlDone[k] = 'done';
-
-        steps.push({
-          arr: [...arr], highlights: mkHL(hlDone),
-          line: [16],
-          desc: `Слияние [${lo}..${hi}] завершено. Копируем результат обратно.`,
-          width, range: `[${lo}..${hi}]`, cmp,
-        });
+        const hl2 = {};
+        for (let k = lo; k <= hi; k++) hl2[k] = 'sorted';
+        steps.push({line:[6], arr:[...arr], highlights:hl2,
+          rangeLabel:`[${lo}..${hi}] слит`, cmp,
+          desc:`Отрезок [${lo}..${hi}] слит и отсортирован.`});
       }
     }
 
-    const allDone = {};
-    arr.forEach((_, k) => { allDone[k] = 'done'; });
-    steps.push({
-      arr: [...arr], highlights: allDone,
-      line: [],
-      desc: '<span class="ok">Массив отсортирован!</span>',
-      width: '—', range: '—', cmp,
-    });
+    const allSorted = {};
+    for (let k = 0; k < n; k++) allSorted[k] = 'sorted';
+    steps.push({line:[], arr:[...arr], highlights:allSorted, rangeLabel:'Готово!', cmp,
+      desc:`Массив отсортирован. Сравнений: ${cmp}.`});
 
     return steps;
   }
@@ -156,21 +139,27 @@ document.addEventListener('DOMContentLoaded', () => {
   function applyStep(step) {
     VizCode.highlight(step.line || []);
     VizState.setDesc(step.desc || '');
-    renderBars(step.arr, step.highlights || {});
-    document.getElementById('s-width').textContent = step.width !== undefined ? step.width : '—';
-    document.getElementById('s-range').textContent = step.range || '—';
-    document.getElementById('s-cmp').textContent = step.cmp !== undefined ? step.cmp : 0;
+    svg.selectAll('g.elem').remove();
+    renderArray(step.arr, step.highlights, step.rangeLabel);
+    const wMatch = step.rangeLabel ? step.rangeLabel.match(/Ширина (\d+)/) : null;
+    document.getElementById('s-width').textContent = wMatch ? wMatch[1] : '—';
+    document.getElementById('s-range').textContent = step.rangeLabel || '—';
+    document.getElementById('s-cmp').textContent = step.cmp;
   }
 
   function run() {
-    const steps = buildSteps();
-    VizAnim.init(
-      [{ line: [], desc: 'Готово к запуску.', arr: [...DEFAULT_ARR], highlights: {}, width: '—', range: '—', cmp: 0 }, ...steps],
-      applyStep
-    );
+    const arr = getArr();
+    setInputVal(arr);
+    const steps = buildSteps(arr);
+    VizAnim.init([
+      {line:[], arr:[...arr], highlights:{}, rangeLabel:'', cmp:0,
+        desc:'Измените массив и нажмите <b>Запустить</b>.'},
+      ...steps
+    ], applyStep);
     VizAnim.reset();
   }
 
   VizAnim.bindUI(run);
+  setInputVal(DEFAULT_ARR);
   run();
 });

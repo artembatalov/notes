@@ -19,9 +19,19 @@
 <main>
   <div id="left-panel">
     <div id="controls"></div>
+    <div style="padding:10px 12px 0;display:flex;gap:8px;align-items:center">
+      <input type="text" id="arr-input"
+        style="flex:1;background:#111;border:1px solid #303030;border-radius:5px;
+               color:#efefef;padding:7px 11px;font-family:'JetBrains Mono',monospace;
+               font-size:13px;outline:none;transition:border-color .15s"
+        value="170, 45, 75, 90, 802, 24, 2, 66"
+        onfocus="this.style.borderColor='#c8973e'"
+        onblur="this.style.borderColor='#303030'">
+      <span style="font-size:11px;color:#585858;white-space:nowrap">← изменить, затем ▶</span>
+    </div>
     <div id="canvas-wrap">
       <svg id="viz-svg"></svg>
-      <div class="canvas-hint">Нажмите Запустить для анимации</div>
+      <div class="canvas-hint">Введите свой массив выше и нажмите Запустить</div>
     </div>
   </div>
   <div id="right-panel">

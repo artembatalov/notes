@@ -1,248 +1,152 @@
 document.addEventListener('DOMContentLoaded', () => {
   buildStdControls();
-
   const svg = d3.select('#viz-svg');
-  svg.attr('viewBox', '0 0 700 380');
+  svg.attr('viewBox','0 0 700 400');
 
-  const INPUT  = [3, 1, 4, 1, 5, 9, 2, 6, 5, 3];
-  const K = 10; // count array size (indices 0..9)
-  const N = INPUT.length;
+  const DEFAULT_ARR = [3, 1, 4, 1, 5, 9, 2, 6, 5, 3];
 
-  // Layout constants
-  const BOX_W = 44, BOX_H = 34, BOX_GAP = 4;
-  const INPUT_Y = 30, OUTPUT_Y = 300;
-  const COUNT_BASE_Y = 255, COUNT_MAX_H = 120, BAR_W = 40;
-  const START_X = 35;
-
-  function xFor(i) { return START_X + i * (BOX_W + BOX_GAP); }
-  function countBarX(i) { return START_X + i * (BOX_W + BOX_GAP); }
-
-  // ── Render helpers ──────────────────────────────────────────
-
-  function renderInputRow(inputHL) {
-    const data = INPUT.map((v, i) => ({ v, i }));
-    const grp = svg.selectAll('g.inp-box').data(data, d => d.i);
-    const enter = grp.enter().append('g').attr('class', 'inp-box');
-    enter.append('rect');
-    enter.append('text').attr('class', 'inp-val');
-
-    const all = grp.merge(enter);
-    all.each(function(d) {
-      const x = xFor(d.i);
-      const col = inputHL[d.i] === 'active' ? '#c8973e'
-                : inputHL[d.i] === 'done'   ? '#3a6a52'
-                : '#2a2a2a';
-      const stroke = inputHL[d.i] ? '#c8973e' : '#444';
-      d3.select(this).select('rect')
-        .attr('x', x).attr('y', INPUT_Y)
-        .attr('width', BOX_W).attr('height', BOX_H)
-        .attr('fill', col).attr('stroke', stroke).attr('rx', 3);
-      d3.select(this).select('.inp-val')
-        .attr('x', x + BOX_W / 2).attr('y', INPUT_Y + BOX_H / 2 + 4)
-        .attr('text-anchor', 'middle').attr('font-size', 13).attr('font-weight', 700)
-        .attr('fill', col === '#2a2a2a' ? '#888' : '#111').text(d.v);
-    });
-    grp.exit().remove();
-
-    // Index labels
-    const idxData = INPUT.map((_, i) => i);
-    const idxGrp = svg.selectAll('text.inp-idx').data(idxData, d => d);
-    idxGrp.enter().append('text').attr('class', 'inp-idx')
-      .merge(idxGrp)
-      .attr('x', d => xFor(d) + BOX_W / 2).attr('y', INPUT_Y + BOX_H + 12)
-      .attr('text-anchor', 'middle').attr('font-size', 9).attr('fill', '#585858')
-      .text(d => d);
-
-    // Label
-    svg.selectAll('text.inp-label').data([0]).join('text').attr('class', 'inp-label')
-      .attr('x', 5).attr('y', INPUT_Y + BOX_H / 2 + 4)
-      .attr('font-size', 10).attr('fill', '#585858').attr('font-weight', 600)
-      .text('Input:');
+  function getArr() {
+    const raw = document.getElementById('arr-input')?.value || '';
+    const p = raw.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n) && n >= 1 && n <= 9);
+    return p.length >= 2 ? p : [...DEFAULT_ARR];
   }
 
-  function renderCountBars(countArr, countHL) {
-    const maxVal = Math.max(...countArr, 1);
-    const data = countArr.map((v, i) => ({ v, i }));
-
-    // Bars
-    const grp = svg.selectAll('g.cnt-bar').data(data, d => d.i);
-    const enter = grp.enter().append('g').attr('class', 'cnt-bar');
-    enter.append('rect');
-    enter.append('text').attr('class', 'cnt-val');
-    enter.append('text').attr('class', 'cnt-idx');
-
-    const all = grp.merge(enter);
-    all.each(function(d) {
-      const x = countBarX(d.i);
-      const h = Math.max(d.v / maxVal * COUNT_MAX_H, d.v > 0 ? 6 : 0);
-      const col = countHL[d.i] === 'active' ? '#c8973e'
-                : countHL[d.i] === 'prefix' ? '#6a9fd4'
-                : d.v > 0 ? '#5a9a72' : '#2a2a2a';
-
-      d3.select(this).select('rect')
-        .attr('x', x).attr('y', COUNT_BASE_Y - h)
-        .attr('width', BAR_W).attr('height', Math.max(h, 2))
-        .attr('fill', col).attr('stroke', '#444').attr('rx', 3);
-      d3.select(this).select('.cnt-val')
-        .attr('x', x + BAR_W / 2).attr('y', COUNT_BASE_Y - h - 5)
-        .attr('text-anchor', 'middle').attr('font-size', 11).attr('font-weight', 700)
-        .attr('fill', col === '#2a2a2a' ? '#444' : (col === '#c8973e' ? '#111' : '#efefef'))
-        .text(d.v);
-      d3.select(this).select('.cnt-idx')
-        .attr('x', x + BAR_W / 2).attr('y', COUNT_BASE_Y + 12)
-        .attr('text-anchor', 'middle').attr('font-size', 10).attr('fill', '#585858')
-        .text(d.i);
-    });
-    grp.exit().remove();
-
-    svg.selectAll('text.cnt-label').data([0]).join('text').attr('class', 'cnt-label')
-      .attr('x', 5).attr('y', COUNT_BASE_Y - COUNT_MAX_H / 2)
-      .attr('font-size', 10).attr('fill', '#585858').attr('font-weight', 600)
-      .text('Count:');
+  function setInputVal(arr) {
+    const el = document.getElementById('arr-input');
+    if (el) el.value = arr.join(', ');
   }
-
-  function renderOutputRow(outputArr, outputHL) {
-    const data = outputArr.map((v, i) => ({ v, i }));
-    const grp = svg.selectAll('g.out-box').data(data, d => d.i);
-    const enter = grp.enter().append('g').attr('class', 'out-box');
-    enter.append('rect');
-    enter.append('text').attr('class', 'out-val');
-
-    const all = grp.merge(enter);
-    all.each(function(d) {
-      const x = xFor(d.i);
-      const isEmpty = d.v === null;
-      const col = isEmpty ? '#1a1a1a'
-                : outputHL[d.i] === 'placed' ? '#5a9a72'
-                : '#3a6a52';
-      const stroke = outputHL[d.i] ? '#5a9a72' : '#333';
-
-      d3.select(this).select('rect')
-        .attr('x', x).attr('y', OUTPUT_Y)
-        .attr('width', BOX_W).attr('height', BOX_H)
-        .attr('fill', col).attr('stroke', stroke).attr('rx', 3);
-      d3.select(this).select('.out-val')
-        .attr('x', x + BOX_W / 2).attr('y', OUTPUT_Y + BOX_H / 2 + 4)
-        .attr('text-anchor', 'middle').attr('font-size', 13).attr('font-weight', 700)
-        .attr('fill', isEmpty ? '#333' : '#111')
-        .text(isEmpty ? '' : d.v);
-    });
-    grp.exit().remove();
-
-    svg.selectAll('text.out-label').data([0]).join('text').attr('class', 'out-label')
-      .attr('x', 5).attr('y', OUTPUT_Y + BOX_H / 2 + 4)
-      .attr('font-size', 10).attr('fill', '#585858').attr('font-weight', 600)
-      .text('Output:');
-  }
-
-  // ── Pseudocode ──────────────────────────────────────────────
 
   VizCode.init([
-    { id: 0,  html: '<span class="cm">// Фаза 1: Подсчёт</span>' },
-    { id: 1,  html: '<span class="kw">for</span> i = <span class="num">0</span> to n-1:' },
-    { id: 2,  html: '  count[input[i]]++' },
-    { id: 3,  html: '<span class="cm">// Фаза 2: Префиксные суммы</span>' },
-    { id: 4,  html: '<span class="kw">for</span> i = <span class="num">1</span> to k-1:' },
-    { id: 5,  html: '  count[i] += count[i-1]' },
-    { id: 6,  html: '<span class="cm">// Фаза 3: Расстановка</span>' },
-    { id: 7,  html: '<span class="kw">for</span> i = n-1 downto <span class="num">0</span>:' },
-    { id: 8,  html: '  val = input[i]' },
-    { id: 9,  html: '  pos = count[val] - <span class="num">1</span>' },
-    { id: 10, html: '  output[pos] = val' },
-    { id: 11, html: '  count[val]--' },
+    {id:0, html:'<span class="cm">// Фаза 1: подсчёт</span>'},
+    {id:1, html:'<span class="kw">for</span> i=0..n-1: count[A[i]]++'},
+    {id:2, html:'<span class="cm">// Фаза 2: префиксные суммы</span>'},
+    {id:3, html:'<span class="kw">for</span> i=1..k: count[i] += count[i-1]'},
+    {id:4, html:'<span class="cm">// Фаза 3: расстановка (справа налево)</span>'},
+    {id:5, html:'<span class="kw">for</span> i=n-1 <span class="kw">downto</span> 0:'},
+    {id:6, html:'  out[--count[A[i]]] = A[i]'},
   ]);
 
-  // ── Step generation ─────────────────────────────────────────
+  function render(input, count, output, inputHL, countHL, outputHL) {
+    svg.selectAll('*').remove();
+    const k = 10;
 
-  function buildSteps() {
-    const steps = [];
-    const countArr = new Array(K).fill(0);
-    const outputArr = new Array(N).fill(null);
+    // Row labels
+    svg.append('text').attr('x',4).attr('y',48).attr('font-size',11)
+      .attr('fill','#585858').attr('font-weight',600).text('Вход:');
+    svg.append('text').attr('x',4).attr('y',180).attr('font-size',11)
+      .attr('fill','#585858').attr('font-weight',600).text('Count:');
+    svg.append('text').attr('x',4).attr('y',320).attr('font-size',11)
+      .attr('fill','#585858').attr('font-weight',600).text('Выход:');
 
-    function push(opts) {
-      steps.push({
-        inputHL: opts.inputHL || {},
-        countArr: [...countArr],
-        countHL: opts.countHL || {},
-        outputArr: [...outputArr],
-        outputHL: opts.outputHL || {},
-        line: opts.line || [],
-        desc: opts.desc || '',
-        phase: opts.phase || '—',
-        elem: opts.elem || '—',
-      });
-    }
-
-    // Initial
-    push({ desc: 'Готово к запуску. Массив input, count[0..9]=0, output пуст.', phase: 'Инициализация', elem: '—' });
-
-    // Phase 1: Count
-    for (let i = 0; i < N; i++) {
-      const val = INPUT[i];
-      push({
-        inputHL: { [i]: 'active' },
-        countHL: { [val]: 'active' },
-        line: [1, 2],
-        desc: `input[${i}]=<b>${val}</b> → count[${val}]++`,
-        phase: '1: Подсчёт', elem: `input[${i}]=${val}`,
-      });
-      countArr[val]++;
-      push({
-        inputHL: { [i]: 'done' },
-        countHL: { [val]: 'active' },
-        line: [2],
-        desc: `count[${val}] теперь равен <b>${countArr[val]}</b>`,
-        phase: '1: Подсчёт', elem: `count[${val}]=${countArr[val]}`,
-      });
-    }
-
-    // Phase 2: Prefix sums
-    for (let i = 1; i < K; i++) {
-      push({
-        countHL: { [i - 1]: 'prefix', [i]: 'active' },
-        line: [4, 5],
-        desc: `Префикс: count[${i}] += count[${i - 1}] = ${countArr[i]} + ${countArr[i - 1]}`,
-        phase: '2: Префикс. суммы', elem: `i=${i}`,
-      });
-      countArr[i] += countArr[i - 1];
-      push({
-        countHL: { [i]: 'active' },
-        line: [5],
-        desc: `count[${i}] = <b>${countArr[i]}</b>`,
-        phase: '2: Префикс. суммы', elem: `count[${i}]=${countArr[i]}`,
-      });
-    }
-
-    // Phase 3: Place
-    for (let i = N - 1; i >= 0; i--) {
-      const val = INPUT[i];
-      const pos = countArr[val] - 1;
-      push({
-        inputHL: { [i]: 'active' },
-        countHL: { [val]: 'active' },
-        line: [7, 8, 9],
-        desc: `input[${i}]=<b>${val}</b>, pos=count[${val}]-1=<b>${pos}</b>`,
-        phase: '3: Расстановка', elem: `val=${val}, pos=${pos}`,
-      });
-      outputArr[pos] = val;
-      countArr[val]--;
-      push({
-        inputHL: { [i]: 'done' },
-        countHL: { [val]: 'active' },
-        outputHL: { [pos]: 'placed' },
-        line: [10, 11],
-        desc: `output[${pos}] = <b>${val}</b>, count[${val}]-- = ${countArr[val]}`,
-        phase: '3: Расстановка', elem: `output[${pos}]=${val}`,
-      });
-    }
-
-    // Final
-    push({
-      outputHL: Object.fromEntries(outputArr.map((_, i) => [i, 'placed'])),
-      line: [],
-      desc: '<span class="ok">Массив отсортирован!</span>',
-      phase: 'Готово', elem: '—',
+    // Input boxes
+    const n = input.length;
+    const bw = Math.min(48, Math.floor(650 / (n+1)));
+    input.forEach((v,i) => {
+      const x = 50 + i*(bw+4);
+      const y = 25;
+      const hl = inputHL[i];
+      svg.append('rect').attr('x',x).attr('y',y).attr('width',bw).attr('height',36).attr('rx',6)
+        .attr('fill', hl==='active' ? '#c8973e' : hl==='done' ? '#2d5e3e' : '#1e1e1e')
+        .attr('stroke', hl ? '#c8973e' : '#333');
+      svg.append('text').attr('x',x+bw/2).attr('y',y+23)
+        .attr('text-anchor','middle').attr('font-size',14).attr('font-weight',700)
+        .attr('font-family',"'JetBrains Mono',monospace")
+        .attr('fill', hl==='active' ? '#111' : hl==='done' ? '#7fc999' : '#777').text(v);
     });
+
+    // Count bars (indices 0..9)
+    const maxC = Math.max(1, ...count.filter(c => c != null));
+    const maxH = 120;
+    const cbw = 52;
+    const csx = 35;
+    for (let c = 0; c < k; c++) {
+      const cv = count[c] ?? 0;
+      const bh = cv / maxC * maxH || 0;
+      const x = csx + c*(cbw+4);
+      const by = 270 - bh;
+      const hl = countHL[c];
+      svg.append('rect').attr('x',x).attr('y',by).attr('width',cbw).attr('height',bh+2).attr('rx',3)
+        .attr('fill', hl==='active' ? '#c8973e' : hl==='sum' ? '#4a7fa8' : hl==='done' ? '#2d5e3e' : '#1e1e1e')
+        .attr('stroke', hl ? '#c8973e' : '#2a2a2a');
+      svg.append('text').attr('x',x+cbw/2).attr('y',by-4)
+        .attr('text-anchor','middle').attr('font-size',12).attr('font-weight',700)
+        .attr('font-family',"'JetBrains Mono',monospace")
+        .attr('fill', cv > 0 ? '#efefef' : '#333').text(cv || '');
+      svg.append('text').attr('x',x+cbw/2).attr('y',280)
+        .attr('text-anchor','middle').attr('font-size',11).attr('fill','#555').text(c);
+    }
+
+    // Output boxes
+    const obw = Math.min(48, Math.floor(650 / (n+1)));
+    output.forEach((v,i) => {
+      if (v === null) return;
+      const x = 50 + i*(obw+4);
+      const y = 295;
+      const hl = outputHL[i];
+      svg.append('rect').attr('x',x).attr('y',y).attr('width',obw).attr('height',36).attr('rx',6)
+        .attr('fill', hl==='placed' ? '#2d6e4e' : hl==='done' ? '#2d5e3e' : '#1e1e1e')
+        .attr('stroke', hl ? '#5a9a72' : '#333');
+      svg.append('text').attr('x',x+obw/2).attr('y',y+23)
+        .attr('text-anchor','middle').attr('font-size',14).attr('font-weight',700)
+        .attr('font-family',"'JetBrains Mono',monospace")
+        .attr('fill', hl ? '#7fffc4' : '#777').text(v);
+    });
+  }
+
+  function buildSteps(inputArr) {
+    const n = inputArr.length;
+    const k = 10;
+    const steps = [];
+    const count = new Array(k).fill(0);
+    const output = new Array(n).fill(null);
+
+    steps.push({phase:'init', input:[...inputArr], count:[...count], output:[...output],
+      inputHL:{}, countHL:{}, outputHL:{},
+      desc:'Сортировка подсчётом. Три фазы: подсчёт → префиксные суммы → расстановка.'});
+
+    // Phase 1
+    steps.push({phase:1, input:[...inputArr], count:[...count], output:[...output],
+      inputHL:{}, countHL:{}, outputHL:{},
+      desc:'<b>Фаза 1</b>: подсчитываем сколько раз встречается каждое значение.'});
+
+    for (let i = 0; i < n; i++) {
+      count[inputArr[i]]++;
+      steps.push({line:[1], input:[...inputArr], count:[...count], output:[...output],
+        inputHL:{[i]:'active'}, countHL:{[inputArr[i]]:'active'}, outputHL:{},
+        desc:`A[${i}]=${inputArr[i]}: count[${inputArr[i]}]++ = ${count[inputArr[i]]}`});
+    }
+
+    // Phase 2
+    steps.push({phase:2, input:[...inputArr], count:[...count], output:[...output],
+      inputHL:{}, countHL:{}, outputHL:{},
+      desc:'<b>Фаза 2</b>: вычисляем префиксные суммы. count[i] = кол-во элементов ≤ i.'});
+
+    for (let c = 1; c < k; c++) {
+      count[c] += count[c-1];
+      steps.push({line:[3], input:[...inputArr], count:[...count], output:[...output],
+        inputHL:{}, countHL:{[c-1]:'sum', [c]:'active'}, outputHL:{},
+        desc:`count[${c}] += count[${c-1}] → count[${c}] = ${count[c]}`});
+    }
+
+    // Phase 3
+    steps.push({phase:3, input:[...inputArr], count:[...count], output:[...output],
+      inputHL:{}, countHL:{}, outputHL:{},
+      desc:'<b>Фаза 3</b>: расставляем элементы в выходной массив справа налево (стабильная сортировка).'});
+
+    for (let i = n-1; i >= 0; i--) {
+      const v = inputArr[i];
+      count[v]--;
+      const pos = count[v];
+      output[pos] = v;
+      steps.push({line:[5,6], input:[...inputArr], count:[...count], output:[...output],
+        inputHL:{[i]:'active'}, countHL:{[v]:'done'}, outputHL:{[pos]:'placed'},
+        desc:`A[${i}]=${v}: позиция count[${v}]=${pos}, output[${pos}]=${v}`});
+    }
+
+    steps.push({line:[], input:[...inputArr], count:[...count], output:[...output],
+      inputHL:{}, countHL:{},
+      outputHL:Object.fromEntries(output.map((_,i) => [i,'done'])),
+      desc:'Готово! Массив отсортирован.'});
 
     return steps;
   }
@@ -250,19 +154,27 @@ document.addEventListener('DOMContentLoaded', () => {
   function applyStep(step) {
     VizCode.highlight(step.line || []);
     VizState.setDesc(step.desc || '');
-    renderInputRow(step.inputHL || {});
-    renderCountBars(step.countArr || new Array(K).fill(0), step.countHL || {});
-    renderOutputRow(step.outputArr || new Array(N).fill(null), step.outputHL || {});
+    render(step.input, step.count, step.output, step.inputHL, step.countHL, step.outputHL);
     document.getElementById('s-phase').textContent = step.phase || '—';
-    document.getElementById('s-elem').textContent = step.elem || '—';
+    const activeEntries = Object.entries(step.inputHL || {});
+    document.getElementById('s-elem').textContent =
+      activeEntries.length ? activeEntries.map(([i]) => step.input[i]).join(', ') : '—';
   }
 
   function run() {
-    const steps = buildSteps();
-    VizAnim.init(steps, applyStep);
+    const arr = getArr();
+    setInputVal(arr);
+    const steps = buildSteps(arr);
+    VizAnim.init([
+      {line:[], input:[...arr], count:new Array(10).fill(0), output:new Array(arr.length).fill(null),
+        inputHL:{}, countHL:{}, outputHL:{},
+        desc:'Измените массив и нажмите <b>Запустить</b>.'},
+      ...steps
+    ], applyStep);
     VizAnim.reset();
   }
 
   VizAnim.bindUI(run);
+  setInputVal(DEFAULT_ARR);
   run();
 });

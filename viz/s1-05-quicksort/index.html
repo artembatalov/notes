@@ -19,9 +19,18 @@
 <main>
   <div id="left-panel">
     <div id="controls"></div>
+    <div style="padding:10px 12px 0;display:flex;gap:8px;align-items:center">
+      <input type="text" id="arr-input" value="5, 3, 8, 1, 9, 2, 7, 4"
+        style="flex:1;background:#111;border:1px solid #303030;border-radius:5px;
+               color:#efefef;padding:7px 11px;font-family:'JetBrains Mono',monospace;
+               font-size:13px;outline:none;transition:border-color .15s"
+        onfocus="this.style.borderColor='#c8973e'"
+        onblur="this.style.borderColor='#303030'">
+      <span style="font-size:11px;color:#585858;white-space:nowrap">← изменить, затем ▶</span>
+    </div>
     <div id="canvas-wrap">
       <svg id="viz-svg"></svg>
-      <div class="canvas-hint">Нажмите Запустить для анимации</div>
+      <div class="canvas-hint">Введите свой массив выше и нажмите Запустить</div>
     </div>
   </div>
   <div id="right-panel">
@@ -30,7 +39,7 @@
       <h3>Состояние</h3>
       <div class="state-row"><span class="state-key">Диапазон</span><span id="s-range">—</span></div>
       <div class="state-row"><span class="state-key">Опорный</span><span id="s-pivot">—</span></div>
-      <div class="state-row"><span class="state-key">i / j</span><span id="s-ij">—</span></div>
+      <div class="state-row"><span class="state-key">Позиция i</span><span id="s-i">—</span></div>
     </div>
     <div id="step-desc">Нажмите <b>Запустить</b>.</div>
   </div>
