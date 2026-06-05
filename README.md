@@ -2,7 +2,7 @@
 
 # Алгоритмы и структуры данных
 
-**ITMO IS · 2 семестр**
+**ITMO IS**
 
 [![PDF Cheatsheet](https://img.shields.io/badge/PDF-Cheatsheet-2563eb?style=for-the-badge&logo=adobeacrobatreader&logoColor=white)](./pdf/cheatsheet.pdf)
 [![Visualizations](https://img.shields.io/badge/31-интерактивных%20визуализаций-6366f1?style=for-the-badge&logo=d3dotjs&logoColor=white)](./viz/)
