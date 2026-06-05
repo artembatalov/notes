@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>19 — Очередь с приоритетом</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../shared/base.css">
+</head>
+<body>
+<header>
+  <a href="../index.html" class="back-link">← Все алгоритмы</a>
+  <h1>19 — <span>Очередь с приоритетом</span></h1>
+  <div class="complexity">
+    <span class="badge">insert/extract: <b>O(log n)</b></span>
+    <span class="badge">changePriority: <b>O(log n)</b></span>
+    <span class="badge">Память: <b>O(n)</b></span>
+  </div>
+</header>
+<main>
+  <div id="left-panel">
+    <div id="controls"></div>
+    <div id="canvas-wrap">
+      <svg id="viz-svg"></svg>
+      <div class="canvas-hint">Нажмите Запустить для анимации</div>
+    </div>
+  </div>
+  <div id="right-panel">
+    <div id="pseudo"><h3>Псевдокод</h3></div>
+    <div id="state-panel">
+      <h3>Состояние</h3>
+      <div class="state-row"><span class="state-key">Операция</span><span id="s-op">—</span></div>
+      <div class="state-row"><span class="state-key">Heap size</span><span id="s-size">—</span></div>
+      <div class="state-row"><span class="state-key">Массив</span><span id="s-arr" style="font-family:monospace;font-size:10px;color:#888;word-break:break-all">—</span></div>
+    </div>
+    <div id="step-desc">Нажмите <b>Запустить</b>.</div>
+  </div>
+</main>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="../shared/engine.js"></script>
+<script src="algo.js"></script>
+</body>
+</html>

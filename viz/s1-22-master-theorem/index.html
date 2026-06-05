@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>22 — Мастер-теорема</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../shared/base.css">
+</head>
+<body>
+<header>
+  <a href="../index.html" class="back-link">← Все алгоритмы</a>
+  <h1>22 — <span>Мастер-теорема</span></h1>
+  <div class="complexity">
+    <span class="badge">T(n) = <b>aT(n/b) + f(n)</b></span>
+  </div>
+</header>
+<main>
+  <div id="left-panel">
+    <div id="controls"></div>
+    <div id="canvas-wrap">
+      <svg id="viz-svg"></svg>
+      <div class="canvas-hint">Три случая теоремы + примеры</div>
+    </div>
+  </div>
+  <div id="right-panel">
+    <div id="pseudo"><h3>Псевдокод</h3></div>
+    <div id="state-panel">
+      <h3>Состояние</h3>
+      <div class="state-row"><span class="state-key">a, b, d</span><span id="s-params">—</span></div>
+      <div class="state-row"><span class="state-key">log_b(a)</span><span id="s-log">—</span></div>
+      <div class="state-row"><span class="state-key">Случай</span><span id="s-case">—</span></div>
+    </div>
+    <div id="step-desc">Нажмите <b>Запустить</b>.</div>
+  </div>
+</main>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="../shared/engine.js"></script>
+<script src="algo.js"></script>
+</body>
+</html>

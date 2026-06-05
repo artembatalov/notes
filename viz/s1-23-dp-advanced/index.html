@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>23 — ДП: маски, профиль, расстояния</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../shared/base.css">
+</head>
+<body>
+<header>
+  <a href="../index.html" class="back-link">← Все алгоритмы</a>
+  <h1>23 — <span>ДП: маски, профиль, расстояния</span></h1>
+  <div class="complexity">
+    <span class="badge">Редакционное расстояние: <b>O(nm)</b></span>
+    <span class="badge">ДП по маскам: <b>O(2ⁿ·n)</b></span>
+  </div>
+</header>
+<main>
+  <div id="left-panel">
+    <div id="controls"></div>
+    <div class="tab-bar" id="mode-tabs" style="display:flex;gap:6px;padding:8px 12px;border-bottom:1px solid #242424;flex-shrink:0">
+      <button class="btn active" id="tab-edit" onclick="setMode('edit')">Ред. расстояние</button>
+      <button class="btn" id="tab-mask" onclick="setMode('mask')">ДП по маскам</button>
+    </div>
+    <div id="canvas-wrap">
+      <svg id="viz-svg"></svg>
+      <div class="canvas-hint">Две задачи: редакционное расстояние и ДП по подмножествам</div>
+    </div>
+  </div>
+  <div id="right-panel">
+    <div id="pseudo"><h3>Псевдокод</h3></div>
+    <div id="state-panel">
+      <h3>Состояние</h3>
+      <div class="state-row"><span class="state-key">Задача</span><span id="s-task">Ред. расстояние</span></div>
+      <div class="state-row"><span class="state-key">Ячейка</span><span id="s-cell">—</span></div>
+      <div class="state-row"><span class="state-key">Значение</span><span id="s-val">—</span></div>
+    </div>
+    <div id="step-desc">Нажмите <b>Запустить</b>.</div>
+  </div>
+</main>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="../shared/engine.js"></script>
+<script src="algo.js"></script>
+</body>
+</html>
