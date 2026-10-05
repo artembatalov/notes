@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>std::list и std::forward_list · Алгоритмы</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../../assets/viz/base.css">
+</head>
+<body>
+<header>
+  <a href="../../index.html#cpp" class="back-link">← Контейнеры C++ (STL)</a>
+  <h1><span>std::list и std::forward_list</span></h1>
+  <div class="complexity">
+    <span class="badge">insert/erase по итератору: <b>O(1)</b></span>
+    <span class="badge">поиск позиции: <b>O(n)</b></span>
+  </div>
+</header>
+<main>
+  <div id="left-panel">
+    <div id="controls"></div>
+    <div id="script-bar"></div>
+    <div id="ops-strip"></div>
+    <div id="canvas-wrap">
+      <svg id="viz-svg"></svg>
+      <div class="canvas-hint">Клик по операции в ленте — перейти к ней · Enter в строке сценария — перезапуск</div>
+    </div>
+  </div>
+  <div id="right-panel">
+    <div id="pseudo"><h3>Код (упрощённый libstdc++)</h3></div>
+    <div id="state-panel">
+      <h3>Состояние</h3>
+      <div class="state-row"><span class="state-key">Тип</span><span class="sv" id="s-kind"></span></div>
+      <div class="state-row"><span class="state-key">size()</span><span class="sv" id="s-size"></span></div>
+      <div class="state-row"><span class="state-key">Элементы</span><span class="sv" id="s-seq"></span></div>
+      <div class="state-row"><span class="state-key">Узел</span><span class="sv" id="s-node"></span></div>
+      <div class="state-row"><span class="state-key">Итератор it</span><span class="sv" id="s-it"></span></div>
+      <p class="note" id="s-note"></p>
+    </div>
+    <div id="step-desc">Нажмите <b>Запустить</b>.</div>
+    <div id="legend">
+      <h3>Легенда</h3>
+      <div class="legend-grid">
+        <div class="legend-item"><span class="leg-line" style="background:#6a9fd4"></span> next</div>
+        <div class="legend-item"><span class="leg-line" style="background:#5a5a5a"></span> prev</div>
+        <div class="legend-item"><span class="leg-line" style="background:#c8973e"></span> Только что изменён</div>
+        <div class="legend-item"><span class="leg-dot" style="background:#d46a6a"></span> Удаляемый узел</div>
+      </div>
+    </div>
+  </div>
+</main>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="../../../assets/viz/engine.js"></script>
+<script src="../../../assets/viz/cpp.js"></script>
+<script src="algo.js"></script>
+<script src="../../../catalog.js"></script>
+<script src="../../../assets/viz/nav.js"></script>
+</body>
+</html>

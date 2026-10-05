@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>std::map и std::set · Алгоритмы</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../../assets/viz/base.css">
+</head>
+<body>
+<header>
+  <a href="../../index.html#cpp" class="back-link">← Контейнеры C++ (STL)</a>
+  <h1><span>std::map и std::set</span></h1>
+  <div class="complexity">
+    <span class="badge">insert/erase/find: <b>O(log n)</b></span>
+    <span class="badge">обход: <b>O(n)</b></span>
+  </div>
+</header>
+<main>
+  <div id="left-panel">
+    <div id="controls"></div>
+    <div id="script-bar"></div>
+    <div id="ops-strip"></div>
+    <div id="canvas-wrap">
+      <svg id="viz-svg"></svg>
+      <div class="canvas-hint">Клик по операции в ленте — перейти к ней · Enter в строке сценария — перезапуск</div>
+    </div>
+  </div>
+  <div id="right-panel">
+    <div id="pseudo"><h3>Код (упрощённый libstdc++)</h3></div>
+    <div id="state-panel">
+      <h3>Состояние</h3>
+      <div class="state-row"><span class="state-key">size()</span><span class="sv" id="s-size"></span></div>
+      <div class="state-row"><span class="state-key">Высота</span><span class="sv" id="s-h"></span></div>
+      <div class="state-row"><span class="state-key">Чёрная выс.</span><span class="sv" id="s-bh"></span></div>
+      <div class="state-row"><span class="state-key">begin()</span><span class="sv" id="s-begin"></span></div>
+      <p class="note"><code>std::map</code>, <code>std::set</code>, <code>multimap</code> и <code>multiset</code> во всех трёх основных реализациях — <b>красно-чёрное дерево</b>. Свойства: корень чёрный, у красного нет красных детей, на любом пути от узла до nil одинаково чёрных. Отсюда высота ≤ 2·log₂(n+1). Узел дерева <code>map&lt;int,int&gt;</code> занимает 40 байт: цвет, три указателя и пара.</p>
+    </div>
+    <div id="step-desc">Нажмите <b>Запустить</b>.</div>
+    <div id="legend">
+      <h3>Легенда</h3>
+      <div class="legend-grid">
+        <div class="legend-item"><span class="leg-dot" style="background:#9c3d3d;border:1px solid #d46a6a"></span> Красный узел</div>
+        <div class="legend-item"><span class="leg-dot" style="background:#161616;border:1px solid #5a5a5a"></span> Чёрный узел</div>
+        <div class="legend-item"><span class="leg-dot" style="background:none;border:2px solid #6a9fd4"></span> Сравнение / путь</div>
+        <div class="legend-item"><span class="leg-dot" style="background:none;border:2px solid #c8973e"></span> Текущий узел</div>
+      </div>
+    </div>
+  </div>
+</main>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="../../../assets/viz/engine.js"></script>
+<script src="../../../assets/viz/cpp.js"></script>
+<script src="model.js"></script>
+<script src="algo.js"></script>
+<script src="../../../catalog.js"></script>
+<script src="../../../assets/viz/nav.js"></script>
+</body>
+</html>

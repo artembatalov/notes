@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>std::unordered_map · Алгоритмы</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../../assets/viz/base.css">
+</head>
+<body>
+<header>
+  <a href="../../index.html#cpp" class="back-link">← Контейнеры C++ (STL)</a>
+  <h1><span>std::unordered_map</span></h1>
+  <div class="complexity">
+    <span class="badge">insert/find/erase: <b>O(1)</b> в среднем</span>
+    <span class="badge">худший: <b>O(n)</b></span>
+  </div>
+</header>
+<main>
+  <div id="left-panel">
+    <div id="controls"></div>
+    <div id="script-bar"></div>
+    <div id="ops-strip"></div>
+    <div id="canvas-wrap">
+      <svg id="viz-svg"></svg>
+      <div class="canvas-hint">Клик по операции в ленте — перейти к ней · Enter в строке сценария — перезапуск</div>
+    </div>
+  </div>
+  <div id="right-panel">
+    <div id="pseudo"><h3>Код (упрощённый libstdc++)</h3></div>
+    <div id="state-panel">
+      <h3>Состояние</h3>
+      <div class="state-row"><span class="state-key">bucket_count</span><span class="sv" id="s-bc"></span></div>
+      <div class="state-row"><span class="state-key">size()</span><span class="sv" id="s-size"></span></div>
+      <div class="state-row"><span class="state-key">load_factor</span><span class="sv" id="s-lf"></span></div>
+      <div class="state-row"><span class="state-key">Макс. цепочка</span><span class="sv" id="s-chain"></span></div>
+      <p class="note">Почему один общий список: <code>begin()</code> и обход всей таблицы не перебирают пустые корзины — O(size), а не O(bucket_count). Корзина указывает на узел <b>перед</b> группой, чтобы удалять и вставлять в односвязном списке за O(1). Узлы при rehash не перемещаются, поэтому указатели и ссылки на элементы остаются валидными, а итераторы — нет.</p>
+    </div>
+    <div id="step-desc">Нажмите <b>Запустить</b>.</div>
+    <div id="legend">
+      <h3>Легенда</h3>
+      <div class="legend-grid">
+        <div class="legend-item"><span class="leg-dot" style="background:#c8973e"></span> Новый / текущий</div>
+        <div class="legend-item"><span class="leg-dot" style="background:#6a9fd4"></span> Сравнение</div>
+        <div class="legend-item"><span class="leg-dot" style="background:#5a9a72"></span> Найден</div>
+        <div class="legend-item"><span class="leg-line" style="background:linear-gradient(90deg,#c8973e,#6a9fd4,#a06ad4)"></span> Цвет = корзина</div>
+      </div>
+    </div>
+  </div>
+</main>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="../../../assets/viz/engine.js"></script>
+<script src="../../../assets/viz/cpp.js"></script>
+<script src="model.js"></script>
+<script src="algo.js"></script>
+<script src="../../../catalog.js"></script>
+<script src="../../../assets/viz/nav.js"></script>
+</body>
+</html>

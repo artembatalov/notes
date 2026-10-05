@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>std::deque · Алгоритмы</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../../assets/viz/base.css">
+</head>
+<body>
+<header>
+  <a href="../../index.html#cpp" class="back-link">← Контейнеры C++ (STL)</a>
+  <h1><span>std::deque</span></h1>
+  <div class="complexity">
+    <span class="badge">push/pop с концов: <b>O(1)</b></span>
+    <span class="badge">[]: <b>O(1)</b></span>
+    <span class="badge">insert в середину: <b>O(n)</b></span>
+  </div>
+</header>
+<main>
+  <div id="left-panel">
+    <div id="controls"></div>
+    <div id="script-bar"></div>
+    <div id="ops-strip"></div>
+    <div id="canvas-wrap">
+      <svg id="viz-svg"></svg>
+      <div class="canvas-hint">Клик по операции в ленте — перейти к ней · Enter в строке сценария — перезапуск</div>
+    </div>
+  </div>
+  <div id="right-panel">
+    <div id="pseudo"><h3>Код (упрощённый libstdc++)</h3></div>
+    <div id="state-panel">
+      <h3>Состояние</h3>
+      <div class="state-row"><span class="state-key">size()</span><span class="sv" id="s-size"></span></div>
+      <div class="state-row"><span class="state-key">Карта</span><span class="sv" id="s-map"></span></div>
+      <div class="state-row"><span class="state-key">Блоков</span><span class="sv" id="s-blocks"></span></div>
+      <div class="state-row"><span class="state-key">start</span><span class="sv" id="s-start"></span></div>
+      <div class="state-row"><span class="state-key">finish</span><span class="sv" id="s-finish"></span></div>
+      <p class="note">Блок здесь — <b>4 элемента</b> для наглядности. В libstdc++ блок занимает 512 байт, то есть 128 <code>int</code>; в libc++ 4096 байт; в MSVC 16 байт, то есть ровно 4 <code>int</code>, как здесь. Элементы <b>никогда не перемещаются</b>: при <code>push_front</code>/<code>push_back</code> ссылки на элементы остаются валидными, а итераторы — нет.</p>
+    </div>
+    <div id="step-desc">Нажмите <b>Запустить</b>.</div>
+    <div id="legend">
+      <h3>Легенда</h3>
+      <div class="legend-grid">
+        <div class="legend-item"><span class="leg-dot" style="background:#c8973e"></span> start (первый)</div>
+        <div class="legend-item"><span class="leg-dot" style="background:#6a9fd4"></span> finish (за последним)</div>
+        <div class="legend-item"><span class="leg-dot" style="background:#a06ad4"></span> Указатель перенесён</div>
+        <div class="legend-item"><span class="leg-dot" style="background:#d46a6a"></span> Уничтожен / освобождён</div>
+      </div>
+    </div>
+  </div>
+</main>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="../../../assets/viz/engine.js"></script>
+<script src="../../../assets/viz/cpp.js"></script>
+<script src="model.js"></script>
+<script src="algo.js"></script>
+<script src="../../../catalog.js"></script>
+<script src="../../../assets/viz/nav.js"></script>
+</body>
+</html>

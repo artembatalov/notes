@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Быстрый выбор (Quickselect) · Алгоритмы</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../../assets/viz/base.css">
+</head>
+<body>
+<header>
+  <a href="../../index.html#search" class="back-link">← Поиск и выбор</a>
+  <h1><span>Быстрый выбор (Quickselect)</span></h1>
+  <div class="complexity">
+    <span class="badge">Время: <b>O(n)</b> avg</span>
+    <span class="badge">Память: <b>O(log n)</b></span>
+  </div>
+</header>
+<main>
+  <div id="left-panel">
+    <div id="controls"></div>
+    <div id="canvas-wrap">
+      <svg id="viz-svg"></svg>
+      <div class="canvas-hint">Нажмите Запустить для анимации</div>
+    </div>
+  </div>
+  <div id="right-panel">
+    <div id="pseudo"><h3>Псевдокод</h3></div>
+    <div id="state-panel">
+      <h3>Состояние</h3>
+      <div class="state-row"><span class="state-key">k-й элемент</span><span id="s-k">—</span></div>
+      <div class="state-row"><span class="state-key">Диапазон</span><span id="s-range">—</span></div>
+      <div class="state-row"><span class="state-key">Опорный</span><span id="s-pivot">—</span></div>
+    </div>
+    <div id="step-desc">Нажмите <b>Запустить</b>.</div>
+  </div>
+</main>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="../../../assets/viz/engine.js"></script>
+<script src="algo.js"></script>
+<script src="../../../catalog.js"></script>
+<script src="../../../assets/viz/nav.js"></script>
+</body>
+</html>

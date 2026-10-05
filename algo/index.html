@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Алгоритмы · Заметки</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <a class="crumb" href="../index.html">← Заметки</a>
+    <span class="spacer"></span>
+    <a class="gh" href="https://github.com/artembatalov/notes">GitHub ↗</a>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="hero">
+    <div class="eyebrow">Раздел</div>
+    <h1 id="title"></h1>
+    <p id="desc"></p>
+    <div class="stats" id="stats"></div>
+  </div>
+</div>
+
+<div class="toolbar">
+  <div class="wrap">
+    <input class="search" id="search" type="search" placeholder="Поиск: дейкстра, heap, std::vector…   ( / )" autocomplete="off">
+    <nav class="toc" id="toc"></nav>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="topics" id="topics"></div>
+  <div class="empty" id="empty" hidden>Ничего не нашлось. <kbd>Esc</kbd> — сбросить поиск.</div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <span><kbd>Space</kbd> play/пауза · <kbd>←</kbd> <kbd>→</kbd> шаг · <kbd>R</kbd> сброс</span>
+    <a href="../index.html">← Все разделы</a>
+  </div>
+</footer>
+
+<script src="../catalog.js"></script>
+<script src="../assets/site.js"></script>
+<script>NotesSite.renderSection('algo');</script>
+</body>
+</html>

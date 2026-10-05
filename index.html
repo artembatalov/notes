@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Заметки</title>
+  <meta name="description" content="Интерактивные конспекты-визуализации: алгоритмы, структуры данных и не только.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <a class="brand" href="index.html">Заметки</a>
+    <span class="spacer"></span>
+    <a class="gh" href="https://github.com/artembatalov/notes">GitHub ↗</a>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="hero">
+    <div class="eyebrow">Интерактивные конспекты</div>
+    <h1>Заметки, которые<br><em>можно запустить</em></h1>
+    <p>Каждая тема — живая визуализация: пошаговая анимация, код с подсветкой текущей строки, состояние на каждом шаге и редактируемый ввод.</p>
+    <div class="stats" id="stats"></div>
+  </div>
+
+  <div class="sections" id="sections"></div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <span>Управление в визуализациях: <kbd>Space</kbd> play/пауза · <kbd>←</kbd> <kbd>→</kbd> шаг · <kbd>R</kbd> сброс</span>
+    <a href="https://github.com/artembatalov/notes">github.com/artembatalov/notes</a>
+  </div>
+</footer>
+
+<script src="catalog.js"></script>
+<script src="assets/site.js"></script>
+<script>NotesSite.renderHub();</script>
+</body>
+</html>

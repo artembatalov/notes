@@ -1,0 +1,135 @@
+/* ═══════════════════════════════════════════════════════════
+   Каталог заметок — единственный источник правды для навигации.
+   Хаб (index.html), страницы разделов и навигация внутри
+   визуализаций строятся из этого файла.
+
+   Раздел   → <section.id>/index.html
+   Материал → <section.id>/<topic.id>/<item.slug>/index.html
+   ═══════════════════════════════════════════════════════════ */
+window.NOTES = {
+  sections: [
+    {
+      id: 'algo',
+      title: 'Алгоритмы и структуры данных',
+      short: 'Алгоритмы',
+      desc: 'Пошаговые анимации: псевдокод с подсветкой строки, состояние алгоритма, редактируемый ввод.',
+      topics: [
+        { id: 'analysis', title: 'Анализ сложности',
+          desc: 'Асимптотика по времени и памяти, рекуррентные соотношения.',
+          items: [
+            { slug: 'time-complexity', title: 'Оценка сложности по времени', t: 'O(1)–O(2ⁿ)' },
+            { slug: 'space-complexity', title: 'Оценка сложности по памяти', t: 'O(1)–O(n²)' },
+            { slug: 'master-theorem', title: 'Мастер-теорема', t: 'T=aT(n/b)+f' },
+          ] },
+        { id: 'search', title: 'Поиск и выбор',
+          desc: 'Бинарный поиск и k-я порядковая статистика.',
+          items: [
+            { slug: 'binary-search', title: 'Бинарный поиск', t: 'O(log n)' },
+            { slug: 'quickselect', title: 'Быстрый выбор (Quickselect)', t: 'O(n) avg' },
+          ] },
+        { id: 'sorting', title: 'Сортировки',
+          desc: 'Сравнением и без: от вставок до поразрядной.',
+          items: [
+            { slug: 'insertion-sort', title: 'Сортировка вставками', t: 'O(n²)' },
+            { slug: 'merge-sort', title: 'Сортировка слиянием', t: 'O(n log n)' },
+            { slug: 'quicksort', title: 'Быстрая сортировка', t: 'O(n log n)' },
+            { slug: 'heapsort', title: 'Пирамидальная сортировка', t: 'O(n log n)' },
+            { slug: 'counting-sort', title: 'Сортировка подсчётом', t: 'O(n+k)' },
+            { slug: 'radix-sort', title: 'Цифровая (поразрядная) сортировка', t: 'O(d·(n+k))' },
+          ] },
+        { id: 'linear', title: 'Линейные структуры',
+          desc: 'Стек, очередь, дек и связные списки.',
+          items: [
+            { slug: 'stack', title: 'Стек', t: 'O(1)' },
+            { slug: 'queue', title: 'Очередь', t: 'O(1)' },
+            { slug: 'deque', title: 'Дек. Очередь с минимумом', t: 'O(1)' },
+            { slug: 'singly-linked-list', title: 'Односвязный список', t: 'O(1)–O(n)' },
+            { slug: 'doubly-linked-list', title: 'Двусвязный список', t: 'O(1)' },
+            { slug: 'circular-list', title: 'Циклический список', t: 'O(1)' },
+            { slug: 'stack-on-list', title: 'Стек на списках', t: 'O(1)' },
+            { slug: 'queue-on-list', title: 'Очередь на списках', t: 'O(1)' },
+          ] },
+        { id: 'heaps', title: 'Кучи',
+          desc: 'Бинарная пирамида и очередь с приоритетом.',
+          items: [
+            { slug: 'binary-heap', title: 'Пирамида', t: 'O(log n)' },
+            { slug: 'build-heap', title: 'Построение пирамиды за O(n)', t: 'O(n)' },
+            { slug: 'heap-delete', title: 'Удаление из пирамиды', t: 'O(log n)' },
+            { slug: 'priority-queue', title: 'Очередь с приоритетом', t: 'O(log n)' },
+          ] },
+        { id: 'hashing', title: 'Хеширование',
+          desc: 'Хеш-таблицы, разрешение коллизий, вероятностные структуры.',
+          items: [
+            { slug: 'chaining', title: 'Хеш-таблица: метод цепочек', t: 'O(1) avg' },
+            { slug: 'open-addressing', title: 'Открытая адресация', t: 'O(1) avg' },
+            { slug: 'cuckoo', title: 'Кукушкино хеширование', t: 'O(1) avg' },
+            { slug: 'bloom-filter', title: 'Фильтр Блума', t: 'O(k)' },
+          ] },
+        { id: 'cpp', title: 'Контейнеры C++ (STL)',
+          desc: 'Как стандартные контейнеры устроены внутри: память, реаллокации, инвалидация итераторов. Поведение — как в libstdc++ (GCC).',
+          items: [
+            { slug: 'vector', title: 'std::vector', t: 'push_back O(1)*' },
+            { slug: 'deque', title: 'std::deque', t: 'O(1) с концов' },
+            { slug: 'list', title: 'std::list и std::forward_list', t: 'insert O(1)' },
+            { slug: 'map', title: 'std::map и std::set (красно-чёрное дерево)', t: 'O(log n)' },
+            { slug: 'unordered-map', title: 'std::unordered_map', t: 'O(1) avg' },
+            { slug: 'string', title: 'std::string и SSO', t: 'SSO ≤ 15' },
+            { slug: 'adaptors', title: 'stack, queue, priority_queue', t: 'адаптеры' },
+          ] },
+        { id: 'dp', title: 'Динамическое программирование',
+          desc: 'Классические задачи, ДП по маскам и профилю.',
+          items: [
+            { slug: 'basic', title: 'ДП: кузнечик, рюкзак, НВП', t: 'O(n)–O(nW)' },
+            { slug: 'advanced', title: 'ДП: маски, профиль, расстояния', t: 'O(2ⁿ·n)' },
+          ] },
+        { id: 'graphs', title: 'Графы: обходы и связность',
+          desc: 'DFS/BFS и всё, что на них строится.',
+          items: [
+            { slug: 'dfs', title: 'Обход в глубину (DFS)', t: 'O(V+E)' },
+            { slug: 'bfs', title: 'Обход в ширину (BFS)', t: 'O(V+E)' },
+            { slug: 'components', title: 'Компоненты связности', t: 'O(V+E)' },
+            { slug: 'topological-sort', title: 'Топологическая сортировка', t: 'O(V+E)' },
+            { slug: 'condensation', title: 'Конденсация графа (Косарайю)', t: 'O(V+E)' },
+            { slug: 'cycles', title: 'Поиск и восстановление циклов', t: 'O(V+E)' },
+            { slug: 'bridges', title: 'Мосты и точки сочленения', t: 'O(V+E)' },
+            { slug: 'euler', title: 'Эйлеров цикл (Хиерхольцер)', t: 'O(E)' },
+            { slug: 'hamilton', title: 'Гамильтонов цикл', t: 'O(n²)' },
+            { slug: 'coloring', title: 'Жадная раскраска графа', t: 'O(V+E)' },
+          ] },
+        { id: 'shortest-paths', title: 'Кратчайшие пути',
+          desc: 'Из одной вершины и между всеми парами.',
+          items: [
+            { slug: 'dijkstra', title: 'Алгоритм Дейкстры', t: 'O((V+E)log V)' },
+            { slug: 'bellman-ford', title: 'Алгоритм Беллмана–Форда', t: 'O(VE)' },
+            { slug: 'dag', title: 'Кратчайшие пути в DAG', t: 'O(V+E)' },
+            { slug: 'floyd-warshall', title: 'Алгоритм Флойда–Уоршелла', t: 'O(V³)' },
+            { slug: 'tree-diameter', title: 'Диаметр дерева', t: 'O(V)' },
+          ] },
+        { id: 'mst', title: 'Минимальные остовные деревья',
+          desc: 'Жадные алгоритмы построения MST.',
+          items: [
+            { slug: 'kruskal', title: 'Алгоритм Краскала', t: 'O(E log E)' },
+            { slug: 'prim', title: 'Алгоритм Прима', t: 'O(E log V)' },
+          ] },
+        { id: 'flows', title: 'Паросочетания и потоки',
+          desc: 'Увеличивающие пути в двудольных графах и сетях.',
+          items: [
+            { slug: 'kuhn', title: 'Алгоритм Куна', t: 'O(VE)' },
+            { slug: 'max-flow', title: 'Форд–Фалкерсон / Эдмондс–Карп', t: 'O(VE²)' },
+            { slug: 'bipartite-matching', title: 'Паросочетание через поток', t: 'O(VE)' },
+          ] },
+        { id: 'strings', title: 'Строки',
+          desc: 'Поиск подстроки, префикс- и Z-функция, боры.',
+          items: [
+            { slug: 'prefix-function', title: 'Префикс-функция', t: 'O(n)' },
+            { slug: 'z-function', title: 'Z-функция', t: 'O(n)' },
+            { slug: 'kmp', title: 'Алгоритм КМП', t: 'O(n+m)' },
+            { slug: 'rabin-karp', title: 'Алгоритм Рабина–Карпа', t: 'O(n+m)' },
+            { slug: 'automaton', title: 'Автомат для поиска подстроки', t: 'O(n·|Σ|)' },
+            { slug: 'trie', title: 'Бор (Trie)', t: 'O(|w|)' },
+            { slug: 'aho-corasick', title: 'Алгоритм Ахо–Корасик', t: 'O(n+m+z)' },
+          ] },
+      ],
+    },
+  ],
+};

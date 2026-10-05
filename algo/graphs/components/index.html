@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Компоненты связности · Алгоритмы</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../../assets/viz/base.css">
+</head>
+<body>
+<header>
+  <a href="../../index.html#graphs" class="back-link">← Графы: обходы и связность</a>
+  <h1><span>Компоненты связности</span></h1>
+  <div class="complexity">
+    <span class="badge">Время: <b>O(V + E)</b></span>
+    <span class="badge">Память: <b>O(V)</b></span>
+  </div>
+</header>
+<main>
+  <div id="left-panel">
+    <div id="controls"></div>
+    <div id="canvas-wrap">
+      <svg id="viz-svg"></svg>
+      <div class="canvas-hint">Клик — вершина · Клик→клик — ребро · ПКМ — удалить · Тащи — перемещать</div>
+    </div>
+  </div>
+  <div id="right-panel">
+    <div id="pseudo"><h3>Псевдокод</h3></div>
+    <div id="state-panel">
+      <h3>Состояние</h3>
+      <div id="comp-list"></div>
+    </div>
+    <div id="step-desc">Нажмите <b>Запустить</b>.</div>
+    <div id="legend">
+      <h3>Легенда</h3>
+      <div class="legend-grid">
+        <div class="legend-item"><span class="leg-dot" style="background:var(--col-white)"></span> Не посещена</div>
+        <div class="legend-item"><span class="leg-dot" style="background:#3b82f6"></span> Компонента 0</div>
+        <div class="legend-item"><span class="leg-dot" style="background:#ef4444"></span> Компонента 1</div>
+        <div class="legend-item"><span class="leg-dot" style="background:#a855f7"></span> Компонента 2</div>
+      </div>
+    </div>
+  </div>
+</main>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="../../../assets/viz/engine.js"></script>
+<script src="algo.js"></script>
+<script src="../../../catalog.js"></script>
+<script src="../../../assets/viz/nav.js"></script>
+</body>
+</html>

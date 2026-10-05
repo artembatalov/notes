@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Дек. Очередь с минимумом · Алгоритмы</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../../assets/viz/base.css">
+</head>
+<body>
+<header>
+  <a href="../../index.html#linear" class="back-link">← Линейные структуры</a>
+  <h1><span>Дек. Очередь с минимумом</span></h1>
+  <div class="complexity">
+    <span class="badge">Все операции: <b>O(1)</b> amortized</span>
+    <span class="badge">Память: <b>O(n)</b></span>
+  </div>
+</header>
+<main>
+  <div id="left-panel">
+    <div id="controls"></div>
+    <div class="tab-bar" id="mode-tabs" style="display:flex;gap:6px;padding:8px 12px;border-bottom:1px solid #242424;flex-shrink:0">
+      <button class="btn active" id="tab-deque" onclick="setMode('deque')">Дек</button>
+      <button class="btn" id="tab-minq" onclick="setMode('minq')">Очередь с min</button>
+    </div>
+    <div id="canvas-wrap">
+      <svg id="viz-svg"></svg>
+      <div class="canvas-hint">Дек: push/pop с обоих концов · Монотонная дека для min за O(1)</div>
+    </div>
+  </div>
+  <div id="right-panel">
+    <div id="pseudo"><h3>Псевдокод</h3></div>
+    <div id="state-panel">
+      <h3>Состояние</h3>
+      <div class="state-row"><span class="state-key">Операция</span><span id="s-op">—</span></div>
+      <div class="state-row"><span class="state-key">Размер</span><span id="s-size">0</span></div>
+      <div class="state-row"><span class="state-key">MIN</span><span id="s-min">—</span></div>
+    </div>
+    <div id="step-desc">Нажмите <b>Запустить</b>.</div>
+  </div>
+</main>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="../../../assets/viz/engine.js"></script>
+<script src="algo.js"></script>
+<script src="../../../catalog.js"></script>
+<script src="../../../assets/viz/nav.js"></script>
+</body>
+</html>

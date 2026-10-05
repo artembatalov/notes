@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Построение пирамиды за O(n) · Алгоритмы</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../../assets/viz/base.css">
+</head>
+<body>
+<header>
+  <a href="../../index.html#heaps" class="back-link">← Кучи</a>
+  <h1><span>Построение пирамиды за O(n)</span></h1>
+  <div class="complexity">
+    <span class="badge">Время: <b>O(n)</b></span>
+    <span class="badge">Память: <b>O(1)</b></span>
+  </div>
+</header>
+<main>
+  <div id="left-panel">
+    <div id="controls"></div>
+    <div id="canvas-wrap">
+      <svg id="viz-svg" viewBox="0 0 700 380"></svg>
+      <div class="canvas-hint">Алгоритм Флойда: [4, 10, 3, 5, 1, 8, 7, 2, 9, 6]</div>
+    </div>
+  </div>
+  <div id="right-panel">
+    <div id="pseudo"><h3>Псевдокод</h3></div>
+    <div id="state-panel">
+      <h3>Состояние</h3>
+      <div class="state-row"><span class="state-key">i (sift-down)</span><span id="s-i">—</span></div>
+      <div class="state-row"><span class="state-key">Сравнений</span><span id="s-cmp">0</span></div>
+      <div class="state-row"><span class="state-key">Массив</span><span id="s-arr">—</span></div>
+    </div>
+    <div id="step-desc">Нажмите <b>Запустить</b>.</div>
+  </div>
+</main>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="../../../assets/viz/engine.js"></script>
+<script src="algo.js"></script>
+<script src="../../../catalog.js"></script>
+<script src="../../../assets/viz/nav.js"></script>
+</body>
+</html>
